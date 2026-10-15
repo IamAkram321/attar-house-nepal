@@ -1,0 +1,40 @@
+import { Router } from "express";
+import healthRouter from "./health";
+import productsRouter from "./products";
+import collectionsRouter from "./collections";
+import categoriesRouter from "./categories";
+import carouselRouter from "./carousel";
+import homepageSectionsRouter from "./homepage-sections";
+import projectsRouter from "./projects";
+import customOrdersRouter from "./custom-orders";
+import cartRouter from "./cart";
+import ordersRouter from "./orders";
+import uploadsRouter from "./uploads";
+import reviewsRouter from "./reviews";
+import testimonialsRouter from "./testimonials";
+import statsRouter from "./stats";
+import authRouter from "./auth";
+import adminRouter from "./admin";
+import paymentRouter from "./payment";
+
+const router = Router();
+
+router.use(healthRouter);
+router.use(authRouter);
+router.use("/admin", adminRouter);
+router.use(productsRouter);
+router.use(collectionsRouter);
+router.use(categoriesRouter);
+router.use(carouselRouter);
+router.use(homepageSectionsRouter);
+router.use(projectsRouter);
+router.use(customOrdersRouter);
+router.use(cartRouter);
+router.use(ordersRouter);
+router.use(paymentRouter);
+router.use(uploadsRouter);
+router.use(reviewsRouter);
+router.use(testimonialsRouter);
+router.use(statsRouter);
+
+export default router;

@@ -1,0 +1,668 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Ayesha Fragrances API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: products
+    description: Product catalog
+  - name: collections
+    description: Curated collections
+  - name: projects
+    description: Featured projects / portfolio
+  - name: custom-orders
+    description: Custom 3D print orders
+  - name: cart
+    description: Shopping cart
+  - name: testimonials
+    description: Customer testimonials
+  - name: stats
+    description: Business metrics
+  - name: categories
+    description: Product categories
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── Products ──────────────────────────────────────────────────────────────
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List products with optional filters
+      parameters:
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: material
+          in: query
+          schema: { type: string }
+        - name: color
+          in: query
+          schema: { type: string }
+        - name: minPrice
+          in: query
+          schema: { type: number }
+        - name: maxPrice
+          in: query
+          schema: { type: number }
+        - name: sort
+          in: query
+          schema: { type: string }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: inStock
+          in: query
+          schema: { type: boolean }
+        - name: limit
+          in: query
+          schema: { type: integer }
+        - name: offset
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Product list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductList"
+
+  /products/featured:
+    get:
+      operationId: listFeaturedProducts
+      tags: [products]
+      summary: Get featured products for homepage
+      responses:
+        "200":
+          description: Featured products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get a single product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+
+  /products/{id}/related:
+    get:
+      operationId: listRelatedProducts
+      tags: [products]
+      summary: Get related products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Related products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  # ── Collections ───────────────────────────────────────────────────────────
+  /collections:
+    get:
+      operationId: listCollections
+      tags: [collections]
+      summary: List all collections
+      responses:
+        "200":
+          description: Collections list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Collection"
+
+  /collections/{slug}:
+    get:
+      operationId: getCollection
+      tags: [collections]
+      summary: Get a collection with its products
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Collection detail with products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionDetail"
+        "404":
+          description: Not found
+
+  # ── Categories ─────────────────────────────────────────────────────────────
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all product categories
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  # ── Projects ──────────────────────────────────────────────────────────────
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List all projects
+      responses:
+        "200":
+          description: Projects list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+
+  /projects/featured:
+    get:
+      operationId: listFeaturedProjects
+      tags: [projects]
+      summary: Get featured projects for homepage
+      responses:
+        "200":
+          description: Featured projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+
+  /projects/{slug}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a single project by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Project detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+
+ 
+  # ── Custom Orders ─────────────────────────────────────────────────────────
+  /custom-orders:
+    post:
+      operationId: createCustomOrder
+      tags: [custom-orders]
+      summary: Submit a custom 3D print order request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomOrderInput"
+      responses:
+        "201":
+          description: Custom order submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOrder"
+        "400":
+          description: Validation error
+
+  # ── Cart ──────────────────────────────────────────────────────────────────
+  /cart:
+    get:
+      operationId: getCart
+      tags: [cart]
+      summary: Get current cart
+      responses:
+        "200":
+          description: Cart contents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  /cart/items:
+    post:
+      operationId: addCartItem
+      tags: [cart]
+      summary: Add item to cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartItemInput"
+      responses:
+        "201":
+          description: Item added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  /cart/items/{itemId}:
+    put:
+      operationId: updateCartItem
+      tags: [cart]
+      summary: Update cart item quantity
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartItemUpdate"
+      responses:
+        "200":
+          description: Cart updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    delete:
+      operationId: removeCartItem
+      tags: [cart]
+      summary: Remove item from cart
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Item removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  # ── Testimonials ──────────────────────────────────────────────────────────
+  /testimonials:
+    get:
+      operationId: listTestimonials
+      tags: [testimonials]
+      summary: Get customer testimonials
+      responses:
+        "200":
+          description: Testimonials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Testimonial"
+
+  # ── Carousel ──────────────────────────────────────────────────────────────
+  /carousel-slides:
+    get:
+      operationId: listCarouselSlides
+      tags: [carousel]
+      summary: List active homepage hero slides
+      responses:
+        "200":
+          description: Active carousel slides
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarouselSlideList"
+
+  # ── Homepage sections ───────────────────────────────────────────────────
+  /homepage-sections/{key}:
+    get:
+      operationId: getHomepageSection
+      tags: [homepage]
+      summary: Get an editable homepage content block
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Homepage content block (defaults when never saved)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomepageSection"
+
+  # ── Stats ─────────────────────────────────────────────────────────────────
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Get business statistics
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string }
+
+    # ── Product ──────────────────────────────────────────────────────────────
+    Product:
+      type: object
+      required: [id, name, slug, price, category, images, inStock, materials]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        price: { type: number }
+        compareAtPrice: { type: ["number", "null"] }
+        description: { type: string }
+        shortDescription: { type: string }
+        category: { type: string }
+        images: { type: array, items: { type: string } }
+        materials: { type: array, items: { type: string } }
+        colors: { type: array, items: { type: string } }
+        dimensions: { type: ["string", "null"] }
+        weight: { type: ["string", "null"] }
+        printTime: { type: ["string", "null"] }
+        inStock: { type: boolean }
+        stock: { type: ["integer", "null"] }
+        featured: { type: boolean }
+        tags: { type: array, items: { type: string } }
+        customizable: { type: boolean }
+        rating: { type: ["number", "null"] }
+        reviewCount: { type: ["integer", "null"] }
+        createdAt: { type: string }
+
+    ProductList:
+      type: object
+      required: [products, total]
+      properties:
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        total: { type: integer }
+
+    # ── Collection ────────────────────────────────────────────────────────────
+    Collection:
+      type: object
+      required: [id, name, slug, description, image]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        image: { type: string }
+        productCount: { type: integer }
+        featured: { type: boolean }
+
+    CollectionDetail:
+      type: object
+      required: [id, name, slug, description, image, products]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        image: { type: string }
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+
+    # ── Category ─────────────────────────────────────────────────────────────
+    Category:
+      type: object
+      required: [id, name, slug, productCount]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        description: { type: ["string", "null"] }
+        image: { type: ["string", "null"] }
+        productCount: { type: integer }
+
+    # ── Project ───────────────────────────────────────────────────────────────
+    Project:
+      type: object
+      required: [id, title, slug, description, images, tags]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        longDescription: { type: ["string", "null"] }
+        images: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+        material: { type: ["string", "null"] }
+        client: { type: ["string", "null"] }
+        featured: { type: boolean }
+        number: { type: ["string", "null"] }
+        createdAt: { type: string }
+
+  
+      type: object
+      required: [id, title, slug, excerpt, coverImage, publishedAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string }
+        content: { type: ["string", "null"] }
+        coverImage: { type: string }
+        category: { type: ["string", "null"] }
+        readTime: { type: ["string", "null"] }
+        publishedAt: { type: string }
+        
+    # ── Custom Order ──────────────────────────────────────────────────────────
+    CustomOrderInput:
+      type: object
+      required: [projectName, description, fullName, email, phone]
+      properties:
+        projectName: { type: string }
+        description: { type: string }
+        intendedUse: { type: ["string", "null"] }
+        lengthMm: { type: ["number", "null"] }
+        widthMm: { type: ["number", "null"] }
+        heightMm: { type: ["number", "null"] }
+        dimensionUnit: { type: string, enum: [mm, cm, inches] }
+        quantity: { type: integer }
+        preferredMaterial: { type: string }
+        preferredColor: { type: ["string", "null"] }
+        desiredFinish: { type: string }
+        budgetRange: { type: ["string", "null"] }
+        desiredDeliveryDate: { type: ["string", "null"] }
+        additionalNotes: { type: ["string", "null"] }
+        fullName: { type: string }
+        email: { type: string }
+        phone: { type: ["string", "null"] }
+        preferredContact: { type: string }
+        fileUrls: { type: array, items: { type: string } }
+
+    CustomOrder:
+      type: object
+      required: [id, projectName, status, createdAt]
+      properties:
+        id: { type: integer }
+        projectName: { type: string }
+        status: { type: string }
+        createdAt: { type: string }
+
+    # ── Cart ──────────────────────────────────────────────────────────────────
+    CartItemInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { type: integer }
+        quantity: { type: integer }
+        color: { type: ["string", "null"] }
+        material: { type: ["string", "null"] }
+        personalization: { type: ["string", "null"] }
+        sizeLabel: { type: ["string", "null"] }
+        unitPrice: { type: ["number", "null"] }
+
+    CartItemUpdate:
+      type: object
+      required: [quantity]
+      properties:
+        quantity: { type: integer }
+
+    CartItem:
+      type: object
+      required: [id, productId, productName, productImage, price, quantity]
+      properties:
+        id: { type: integer }
+        productId: { type: integer }
+        productName: { type: string }
+        productImage: { type: string }
+        price: { type: number }
+        quantity: { type: integer }
+        color: { type: ["string", "null"] }
+        material: { type: ["string", "null"] }
+        personalization: { type: ["string", "null"] }
+
+    Cart:
+      type: object
+      required: [items, subtotal, itemCount]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItem"
+        subtotal: { type: number }
+        itemCount: { type: integer }
+
+    # ── Testimonial ───────────────────────────────────────────────────────────
+    Testimonial:
+      type: object
+      required: [id, name, rating, text]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        initials: { type: string }
+        avatar: { type: ["string", "null"] }
+        rating: { type: number }
+        text: { type: string }
+        productPurchased: { type: ["string", "null"] }
+        location: { type: ["string", "null"] }
+
+    # ── Carousel ──────────────────────────────────────────────────────────────
+    CarouselSlide:
+      type: object
+      required: [id, title, image, sortOrder, isActive, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        image: { type: string }
+        ctaLabel: { type: ["string", "null"] }
+        ctaHref: { type: ["string", "null"] }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+        createdAt: { type: string }
+
+    CarouselSlideList:
+      type: object
+      required: [slides, total]
+      properties:
+        slides:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarouselSlide"
+        total: { type: integer }
+
+    # ── Homepage section ────────────────────────────────────────────────────
+    HomepageSection:
+      type: object
+      required: [key, title, sortOrder, isActive]
+      properties:
+        key: { type: string }
+        eyebrow: { type: ["string", "null"] }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        image: { type: ["string", "null"] }
+        primaryCtaLabel: { type: ["string", "null"] }
+        primaryCtaHref: { type: ["string", "null"] }
+        secondaryCtaLabel: { type: ["string", "null"] }
+        secondaryCtaHref: { type: ["string", "null"] }
+        overlayTitle: { type: ["string", "null"] }
+        overlaySubtitle: { type: ["string", "null"] }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+
+    # ── Stats ─────────────────────────────────────────────────────────────────
+    Stats:
+      type: object
+      required: [customersServed, projectsCompleted, customDesigns, printingHours, satisfactionPercent, avgProductionDays]
+      properties:
+        customersServed: { type: integer }
+        projectsCompleted: { type: integer }
+        customDesigns: { type: integer }
+        printingHours: { type: integer }
+        satisfactionPercent: { type: number }
+        avgProductionDays: { type: number }
