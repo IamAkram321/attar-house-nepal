@@ -62,8 +62,8 @@ export default function TermsPage() {
           <h3 className="font-serif text-xl font-normal text-neutral-900 mb-2">Concierge Advisory</h3>
           <p className="text-neutral-600 font-light text-sm leading-relaxed">
             For clarification on any terms, please reach out to our private concierge at{' '}
-            <a href="mailto:concierge@ayeshafragrances.com" className="text-[#8C6D37] underline font-medium">
-              concierge@ayeshafragrances.com
+            <a href="mailto:hello@attarhousenepal.com" className="text-[#8C6D37] underline font-medium">
+              hello@attarhousenepal.com
             </a>.
           </p>
         </div>

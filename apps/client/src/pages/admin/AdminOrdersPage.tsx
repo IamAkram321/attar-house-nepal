@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import {
   Search,
   Eye,
@@ -159,7 +159,6 @@ export default function AdminOrdersPage() {
 
   return (
     <AdminLayout>
-      <Toaster richColors position="bottom-right" />
       <div className="space-y-8 relative">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

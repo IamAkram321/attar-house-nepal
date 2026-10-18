@@ -1,5 +1,5 @@
 /**
- * Ayesha Fragrances — Local-first attar imagery (EDITABLE)
+ * Attar House Nepal — Local-first attar imagery (EDITABLE)
  * =========================================================
  * Owner photo TODO (real bottle shots beat Unsplash):
  *  - /public/images/attar/6ml-rollon-front.jpg

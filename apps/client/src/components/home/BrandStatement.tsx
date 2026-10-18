@@ -90,7 +90,7 @@ export function BrandStatement() {
             transition={{ delay: 0.35 }}
             className="mt-10 max-w-2xl text-base md:text-xl leading-relaxed text-neutral-300 font-light"
           >
-            Every creation at Ayesha Fragrances begins as an unhurried reverie. We source rare petals hand-harvested at dawn in Grasse, pure wild Cambodian agarwood, and aged Bourbon vanilla. Each batch is cold-macerated for months to achieve unparalleled depth, longevity, and sublime distinction.
+            Every creation at Attar House Nepal begins as an unhurried reverie. We source rare petals hand-harvested at dawn in Grasse, pure wild Cambodian agarwood, and aged Bourbon vanilla. Each batch is cold-macerated for months to achieve unparalleled depth, longevity, and sublime distinction.
           </motion.p>
 
           <motion.div

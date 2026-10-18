@@ -206,7 +206,7 @@ const LUXURY_PRODUCTS = [
 ];
 
 async function seed() {
-  console.log("Seeding Ayesha Fragrances luxury catalog...");
+  console.log("Seeding Attar House Nepal luxury catalog...");
 
   console.log("1. Seeding categories...");
   await db.delete(categoriesTable);
@@ -238,11 +238,11 @@ async function seed() {
     }
   }
 
-  console.log("Ayesha Fragrances catalog successfully seeded!");
+  console.log("Attar House Nepal catalog successfully seeded!");
   process.exit(0);
 }
 
 seed().catch((err) => {
-  console.error("Failed to seed Ayesha Fragrances catalog:", err);
+  console.error("Failed to seed Attar House Nepal catalog:", err);
   process.exit(1);
 });

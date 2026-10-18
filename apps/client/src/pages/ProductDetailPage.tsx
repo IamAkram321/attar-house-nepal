@@ -5,7 +5,7 @@ import { useGetProduct, useAddCartItem } from '@workspace/api-client-react';
 import { useState, useMemo } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { ProductReviews } from '@/components/ui/ProductReviews';
 import { AttarProductMeta } from '@/components/attar/AttarProductMeta';
 import { VerificationNote } from '@/components/attar/VerificationNote';
@@ -142,6 +142,10 @@ export default function ProductDetailPage() {
   const kind = getKind(displayProduct as any);
   const audiences = getAudiences(displayProduct as any);
 
+  const images = (displayProduct.images && displayProduct.images.length > 0)
+    ? displayProduct.images
+    : ["https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=1200"];
+
   const seo = ATTAR_SEO.product(displayProduct.name ?? "Attar", brand);
   // Structured data from backend truth only — preview-only fallback products
   // must never emit invented prices or availability into JSON-LD.
@@ -180,12 +184,22 @@ export default function ProductDetailPage() {
   const notes = parseNotes(displayProduct.materials);
 
   const handleAddToCart = () => {
-    if (!displayProduct || !hasPrice || outOfStock) return;
+    if (!displayProduct || !hasPrice || outOfStock || isBackendMissing) return;
+
+    const productId = typeof displayProduct.id === 'number' ? displayProduct.id : null;
+    if (!productId) {
+      toast({
+        title: "Cannot add to bag",
+        description: "This product is not available in the catalogue yet. Create it in /admin → Catalog first.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     addCartItem.mutate(
       {
         data: {
-          productId: typeof displayProduct.id === 'number' ? displayProduct.id : 1,
+          productId,
           quantity,
           material: effectiveSize,
           sizeLabel: effectiveSize,
@@ -222,26 +236,22 @@ export default function ProductDetailPage() {
     );
   };
 
-  const images = (displayProduct.images && displayProduct.images.length > 0)
-    ? displayProduct.images
-    : ["https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=1200"];
-
   // First paint: neutral skeleton while the product loads — never flash the
   // local fallback content and then swap it once the API resolves.
   if (isLoading) {
     return (
-      <div className="pt-36 pb-20 bg-ivory text-coal min-h-screen">
-        <div className="max-w-6xl mx-auto px-5 sm:px-6">
-          <div className="mb-6 h-4 w-64 rounded bg-beige animate-pulse" />
+      <div className="pt-12 pb-20 bg-background text-foreground min-h-screen">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-6 h-4 w-64 rounded bg-border animate-pulse" />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             <div className="lg:col-span-6">
-              <div className="aspect-[4/5] w-full rounded-xl bg-beige animate-pulse" />
+              <div className="aspect-[4/5] w-full rounded-lg bg-border animate-pulse" />
             </div>
             <div className="lg:col-span-6 space-y-4">
-              <div className="h-8 w-3/4 rounded bg-beige animate-pulse" />
-              <div className="h-5 w-1/3 rounded bg-beige animate-pulse" />
-              <div className="h-24 w-full rounded-xl bg-beige animate-pulse" />
-              <div className="h-12 w-48 rounded-lg bg-beige animate-pulse" />
+              <div className="h-8 w-3/4 rounded bg-border animate-pulse" />
+              <div className="h-5 w-1/3 rounded bg-border animate-pulse" />
+              <div className="h-24 w-full rounded-lg bg-border animate-pulse" />
+              <div className="h-12 w-48 rounded-lg bg-border animate-pulse" />
             </div>
           </div>
         </div>
@@ -250,18 +260,12 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="pt-36 pb-20 bg-ivory text-coal min-h-screen selection:bg-brass/20 selection:text-pine">
-      
-      {/* Background Lighting & Orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#c5a265_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.03]" />
-        <div className="absolute right-0 top-1/4 w-[600px] h-[600px] rounded-full bg-brass/10 blur-[140px]" />
-      </div>
+    <div className="pt-12 pb-20 bg-background text-foreground min-h-screen">
 
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Breadcrumb Navigation */}
-        <div className="mb-6 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-500">
+        <div className="mb-6 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
           <Link href="/shop?kind=attar" className="hover:text-pine transition-colors">
             Attars
           </Link>
@@ -278,34 +282,15 @@ export default function ProductDetailPage() {
           <div className="lg:col-span-6 space-y-4">
             
             {/* Main Image Viewport */}
-            <div className="bg-pine border border-pine-deep rounded-xl relative overflow-hidden shadow-xl aspect-[4/5] w-full flex items-center justify-center group">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={selectedImage}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-full"
-                >
-                  <img
-                    src={cloudinarySrc(images[selectedImage] || images[0], 1200)}
-                    alt={displayProduct.name}
-                    loading="eager"
-                    fetchPriority="high"
-                    decoding="async"
-                    className="w-full h-full object-cover object-center filter contrast-[1.03] brightness-[0.93] transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Badge Overlay */}
-              <div className="absolute top-4 left-4 z-20">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-pine border border-brass/40 backdrop-blur-md font-mono text-[10px] text-ivory tracking-wider uppercase font-medium shadow-md">
-                  <Sparkles className="w-3 h-3 text-brass" />
-                  Attar House Nepal
-                </span>
-              </div>
+            <div className="border border-border rounded-lg bg-background aspect-[4/5] w-full flex items-center justify-center">
+              <img
+                src={cloudinarySrc(images[selectedImage] || images[0], 1200)}
+                alt={displayProduct.name}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                className="w-full h-full object-cover object-center"
+              />
             </div>
 
             {/* Thumbnail Navigation */}
@@ -361,7 +346,7 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-neutral-900 tracking-tight leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight leading-tight">
                 {displayProduct.name}
               </h1>
 
@@ -386,7 +371,7 @@ export default function ProductDetailPage() {
               <div className="flex items-baseline gap-3 pt-1">
                 {hasPrice ? (
                   <>
-                    <span className="font-mono text-2xl sm:text-3xl font-semibold text-neutral-900">
+                    <span className="text-xl sm:text-2xl font-semibold text-foreground">
                       Rs. {currentPrice.toLocaleString()}
                     </span>
                     {displayProduct.compareAtPrice && Number(displayProduct.compareAtPrice) > currentPrice && (
@@ -405,7 +390,7 @@ export default function ProductDetailPage() {
 
             {/* Description */}
             <p className="text-neutral-600 text-sm sm:text-base leading-relaxed font-light">
-              {displayProduct.description || displayProduct.shortDescription}
+              {displayProduct.shortDescription || 'No description available.'}
             </p>
 
             {/* Attar profile: family, origin, concentration, sizes — derived, verification-flagged */}
@@ -519,8 +504,8 @@ export default function ProductDetailPage() {
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  disabled={addCartItem.isPending || !hasPrice || outOfStock}
-                  title={!hasPrice ? "Set NPR price in /admin before selling this draft" : outOfStock ? "Currently out of stock" : "Add to bag"}
+                  disabled={addCartItem.isPending || !hasPrice || outOfStock || isBackendMissing}
+                  title={!hasPrice ? "Set NPR price in /admin before selling this draft" : outOfStock ? "Currently out of stock" : isBackendMissing ? "Create this product in /admin → Catalog before selling" : "Add to bag"}
                   className="btn-primary flex-1 py-4 px-6 shadow-md hover:shadow-lg"
                 >
                   <ShoppingBag className="w-4 h-4" />

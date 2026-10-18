@@ -84,16 +84,8 @@ export default function CollectionsPage() {
   }, [rawCollections, searchQuery]);
 
   return (
-    <div className="relative pt-36 md:pt-40 pb-24 md:pb-32 bg-ivory text-neutral-900 min-h-screen overflow-hidden selection:bg-brass/20 selection:text-neutral-900">
-      
-      {/* Background Ambience */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#B79A62_0.6px,transparent_0.6px)] [background-size:28px_28px] opacity-15" />
-        <div className="absolute -right-20 top-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-brass/15 via-transparent to-transparent blur-[120px]" />
-        <div className="absolute left-10 bottom-20 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-brass/10 via-brass/5 to-transparent blur-[130px]" />
-      </div>
-
-      <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-7xl">
+    <div className="pt-12 pb-24 bg-background text-foreground min-h-screen">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         
         {/* Header Layout */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12 border-b border-neutral-200 pb-8">

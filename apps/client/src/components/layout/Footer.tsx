@@ -99,10 +99,10 @@ export function Footer() {
                 </a>
               </div>
               <a
-                href="mailto:hello@ayeshafragrances.com"
+                href="mailto:hello@attarhousenepal.com"
                 className="block text-ivory/70 hover:text-white transition-colors break-all"
               >
-                hello@ayeshafragrances.com
+                hello@attarhousenepal.com
               </a>
               <p className="text-xs text-ivory/50 leading-relaxed">
                 Attar oils 3–12ml · Sprays as listed. Sizes and prices confirmed per product.

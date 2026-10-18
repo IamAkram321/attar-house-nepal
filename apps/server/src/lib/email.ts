@@ -9,7 +9,7 @@ if (!RESEND_API_KEY) {
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
-const FROM = EMAIL_FROM || "Ayesha Fragrances <concierge@ayeshafragrances.com>";
+const FROM = EMAIL_FROM || "Attar House Nepal <concierge@attarhousenepal.com>";
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Pending Allocation",
@@ -64,7 +64,7 @@ export function emailShell(title: string, bodyHtml: string): string {
                 <tr>
                   <td style="background: #121212; padding: 26px; text-align: center;">
                     <span style="color: #C5A265; font-family: Georgia, serif; font-size: 20px; letter-spacing: 0.18em; font-weight: 500; text-transform: uppercase;">
-                      AYESHA FRAGRANCES
+                      ATTAR HOUSE NEPAL
                     </span>
                     <br/>
                     <span style="color: #A3907C; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;">
@@ -87,9 +87,9 @@ export function emailShell(title: string, bodyHtml: string): string {
                 <tr>
                   <td style="background: #FAF8F5; padding: 22px 28px; border-top: 1px solid #EAE6DF; text-align: center;">
                     <p style="font-size: 11px; color: #8C8A84; margin: 0; line-height: 1.6;">
-                      <strong>Ayesha Fragrances</strong> &middot; Haute Parfumerie &middot; Private Concierge<br/>
-                      Mayfair, London &middot; Grasse, France &middot; Kathmandu<br/>
-                      <a href="mailto:concierge@ayeshafragrances.com" style="color: #8C6D37; text-decoration: none;">concierge@ayeshafragrances.com</a>
+                      <strong>Attar House Nepal</strong> &middot; Attars First &middot; Private Concierge<br/>
+                      Kathmandu, Nepal<br/>
+                      <a href="mailto:hello@attarhousenepal.com" style="color: #8C6D37; text-decoration: none;">hello@attarhousenepal.com</a>
                     </p>
                   </td>
                 </tr>
@@ -113,7 +113,7 @@ export async function sendOrderConfirmationEmail(order: Order, items: OrderItem[
     await resend.emails.send({
       from: FROM,
       to: order.customerEmail,
-      subject: `Order #${order.id} confirmed — Ayesha Fragrances`,
+      subject: `Order #${order.id} confirmed — Attar House Nepal`,
       html: emailShell(
         "Thank you for your commission",
         `
@@ -171,7 +171,7 @@ export async function sendOrderStatusUpdateEmail(order: Order): Promise<void> {
     await resend.emails.send({
       from: FROM,
       to: order.customerEmail,
-      subject: `Order #${order.id} update: ${label} — Ayesha Fragrances`,
+      subject: `Order #${order.id} update: ${label} — Attar House Nepal`,
       html: emailShell(
         `Order Update: ${label}`,
         `
@@ -207,12 +207,12 @@ export async function sendVerificationEmail(email: string, name: string, rawToke
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: "Verify your email — Ayesha Fragrances",
+      subject: "Verify your email — Attar House Nepal",
       html: emailShell(
         "Confirm your email address",
         `
         <p style="color: #4A4845; font-size: 15px; line-height: 1.6;">
-          Dear <strong>${name}</strong>, thank you for joining the Ayesha Fragrances circle. Please verify your email to access your private olfactive profile and order archives.
+          Dear <strong>${name}</strong>, thank you for joining the Attar House Nepal circle. Please verify your email to access your private olfactive profile and order archives.
         </p>
 
         <div style="text-align: center; margin: 32px 0;">
@@ -242,7 +242,7 @@ export async function sendPasswordResetEmail(email: string, name: string, rawTok
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: "Reset your password — Ayesha Fragrances",
+      subject: "Reset your password — Attar House Nepal",
       html: emailShell(
         "Reset your password",
         `
@@ -275,7 +275,7 @@ export async function sendPasswordChangedEmail(email: string, name: string): Pro
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: "Your password was changed — Ayesha Fragrances",
+      subject: "Your password was changed — Attar House Nepal",
       html: emailShell(
         "Password changed",
         `
@@ -283,7 +283,7 @@ export async function sendPasswordChangedEmail(email: string, name: string): Pro
           Dear <strong>${name}</strong>, your account password was successfully updated.
         </p>
         <p style="color: #8C8A84; font-size: 13px; margin-top: 16px;">
-          If you did not make this change, please contact our concierge immediately at concierge@ayeshafragrances.com.
+          If you did not make this change, please contact our concierge immediately at hello@attarhousenepal.com.
         </p>
         `
       ),
@@ -304,7 +304,7 @@ export async function sendAccountAlreadyExistsEmail(email: string, name: string)
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: "Sign-up attempt on your account — Ayesha Fragrances",
+      subject: "Sign-up attempt on your account — Attar House Nepal",
       html: emailShell(
         "Account notice",
         `

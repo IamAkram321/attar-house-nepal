@@ -60,7 +60,7 @@ export function ThreeDShowcase() {
           style={{ opacity }}
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[14vw] font-serif font-light tracking-[0.2em] text-amber-100/10 whitespace-nowrap select-none pointer-events-none z-0 uppercase"
         >
-          AYESHA
+          ATTAR HOUSE NEPAL
         </motion.h1>
       </div>
 

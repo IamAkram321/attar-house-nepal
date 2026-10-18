@@ -1,5 +1,5 @@
 /**
- * Ayesha Fragrances — Editable Reference Catalog (DRAFTS)
+ * Attar House Nepal — Editable Reference Catalog (DRAFTS)
  * ========================================================
  * HOW TO USE (owner):
  * 1. Each entry below is a REFERENCE DRAFT, not verified inventory.
@@ -430,7 +430,7 @@ export const ATTAR_REFERENCE_DRAFTS: Product[] = [
     featured: true,
   }),
   draft({
-    id: 950, brand: "Ayesha", referenceDraft: true, needsVerification: true,
+    id: 950, brand: "Attar House Nepal", referenceDraft: true, needsVerification: true,
     familySlug: "arabian-blends", originSlug: "dubai-modern",
     source: "House concept: 2ml trial vials across families for layering discovery — owner sets vial lineup + NPR price.",
     name: "Attar Discovery Set 5x2ml — EDIT ME",
@@ -444,4 +444,4 @@ export const ATTAR_REFERENCE_DRAFTS: Product[] = [
   }),
 ];
 
-export const REFERENCE_BRANDS = ["Al-Nuaim", "Al-Rehab", "Ajmal", "Adil Qadri", "Lattafa", "Rasasi", "Afnan", "Ayesha"] as const;
+export const REFERENCE_BRANDS = ["Al-Nuaim", "Al-Rehab", "Ajmal", "Adil Qadri", "Lattafa", "Rasasi", "Afnan"] as const;

@@ -3,16 +3,18 @@ import { LogOut, Package, ShieldCheck, ShoppingBag, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AccountPage() {
   const { user, isLoading, isAdmin, logout } = useAuth();
   const { cartItemCount } = useCart();
+  const { toast } = useToast();
 
   if (isLoading) {
     return (
-      <div className="pt-36 pb-24 min-h-[60vh] flex items-center justify-center">
+      <div className="pt-12 pb-24 min-h-[60vh] flex items-center justify-center">
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <span className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <span className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           Loading your account…
         </div>
       </div>
@@ -21,8 +23,8 @@ export default function AccountPage() {
 
   if (!user) {
     return (
-      <div className="pt-36 pb-24 min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
-        <h1 className="text-3xl font-semibold tracking-tight mb-3">Sign in to view your account</h1>
+      <div className="pt-12 pb-24 min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">Sign in to view your account</h1>
         <p className="text-coal/60 mb-8 max-w-sm">
           Your profile details, orders and shopping bag live here once you're signed in.
         </p>
@@ -49,10 +51,10 @@ export default function AccountPage() {
     : null;
 
   return (
-    <div className="pt-36 lg:pt-40 pb-24 bg-ivory text-coal min-h-screen">
+    <div className="pt-12 lg:pt-16 pb-24 bg-background text-coal min-h-screen">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <p className="eyebrow">My account</p>
-        <h1 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Profile</h1>
+        <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Profile</h1>
 
         {/* User details */}
         <div className="card-flat mt-8 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-5">
@@ -95,7 +97,7 @@ export default function AccountPage() {
         <div className="mt-4 grid sm:grid-cols-2 gap-3">
           <Link
             href="/orders"
-            className="card-flat card-hover p-5 flex items-center gap-4"
+            className="card-flat p-5 flex items-center gap-4"
           >
             <span className="flex items-center justify-center w-11 h-11 rounded-lg bg-pine/10 text-pine shrink-0">
               <Package className="w-5 h-5" />
@@ -105,7 +107,7 @@ export default function AccountPage() {
               <span className="block text-xs text-coal/55 mt-0.5">Track and review past orders</span>
             </span>
           </Link>
-          <Link href="/cart" className="card-flat card-hover p-5 flex items-center gap-4">
+          <Link href="/cart" className="card-flat p-5 flex items-center gap-4">
             <span className="flex items-center justify-center w-11 h-11 rounded-lg bg-pine/10 text-pine shrink-0">
               <ShoppingBag className="w-5 h-5" />
             </span>
@@ -119,7 +121,7 @@ export default function AccountPage() {
           {isAdmin && (
             <Link
               href="/admin/orders"
-              className="card-flat card-hover p-5 flex items-center gap-4 sm:col-span-2"
+              className="card-flat p-5 flex items-center gap-4 sm:col-span-2"
             >
               <span className="flex items-center justify-center w-11 h-11 rounded-lg bg-brass/15 text-brass-deep shrink-0">
                 <ShieldCheck className="w-5 h-5" />
@@ -134,7 +136,10 @@ export default function AccountPage() {
 
         <Button
           variant="outline"
-          onClick={logout}
+          onClick={() => {
+            logout();
+            toast({ title: "Signed out", description: "You have been logged out successfully." });
+          }}
           className="mt-6 gap-2 rounded-lg text-rose-700 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
         >
           <LogOut className="w-4 h-4" />

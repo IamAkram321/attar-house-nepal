@@ -59,13 +59,10 @@ export default function OffersPage() {
   const discounted = filterCatalog(products, { preset: "discounted" });
 
   return (
-    <div className="relative pt-36 lg:pt-40 pb-24 bg-ivory text-neutral-900 min-h-screen overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#c5a265_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.03]" />
-      </div>
-      <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10 max-w-7xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-pine mb-2">Save on attars</p>
-        <h1 className="font-serif text-4xl sm:text-5xl tracking-tight">Explore Fragrance Offers</h1>
+    <div className="pt-12 pb-24 bg-background text-foreground min-h-screen">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent-foreground mb-2">Save on attars</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">Explore Fragrance Offers</h1>
         <p className="mt-3 max-w-2xl text-sm md:text-base font-light text-neutral-600 leading-relaxed">
           Combo deals and marked-down attars at Attar House Nepal. Discounts show against each product&apos;s own listed price.
         </p>

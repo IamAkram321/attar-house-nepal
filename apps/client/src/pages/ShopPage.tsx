@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useSearch } from "wouter";
 import { useListCategories } from "@workspace/api-client-react";
-import { Search, SlidersHorizontal, Sparkles, RotateCcw, X, Filter, Check, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal, RotateCcw, X, Filter, Check, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ProductCard, type Product } from "@/components/product/ProductCard";
@@ -592,29 +591,21 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="relative pt-36 lg:pt-40 pb-24 bg-ivory text-coal min-h-screen overflow-hidden selection:bg-brass/20 selection:text-pine">
-      
-      {/* Background Lighting & Orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#B79A62_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.03]" />
-        <div className="absolute -right-20 top-1/4 w-[600px] h-[600px] rounded-full bg-brass/10 blur-[140px]" />
-        <div className="absolute -left-20 bottom-10 w-[500px] h-[500px] rounded-full bg-sand/60 blur-[150px]" />
-      </div>
-
-      <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10 max-w-7xl">
+    <div className="pt-12 pb-24 bg-background text-foreground min-h-screen">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         
         {/* Page Header & Search Toolbar */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 pb-6 border-b border-neutral-300/80 gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 pb-6 border-b border-border gap-6">
           <div>
-            <div className="flex items-center gap-2 text-pine font-mono text-xs uppercase tracking-widest mb-2 font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-brass-deep" />
-              <span>Attars · Musk · Oud · Floral · Amber</span>
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest mb-2 text-accent-foreground">
+              <span>Breathe in. Breathe out. Find your scent.</span>
             </div>
-            <h1 className="font-serif text-4xl sm:text-5xl font-normal text-neutral-900 tracking-tight">
+            <h1 className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
               {seo.h1}
             </h1>
-            <p className="mt-2 text-neutral-600 font-light text-sm md:text-base max-w-xl leading-relaxed">
-              Concentrated attar oils, mukhallat blends, and oriental sprays — floral, oud, musk, woody, amber, and herbal traditions. Origins and notes shown as currently listed; verification in progress.
+            <p className="mt-2 text-muted-foreground text-sm md:text-base max-w-xl leading-relaxed">
+              Each drop tells a story — of rain-soaked forests, sun-baked resins, and gardens that bloom at dusk.
+              Explore attar oils that awaken memory, calm the mind, and linger like a secret on your skin.
             </p>
           </div>
 
@@ -742,38 +733,25 @@ export default function ShopPage() {
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8" aria-label="Loading products">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i}>
-                  <div className="aspect-[4/5] w-full rounded-xl bg-beige animate-pulse" />
-                  <div className="mt-3 h-4 w-3/4 rounded bg-beige animate-pulse" />
-                  <div className="mt-2 h-4 w-1/3 rounded bg-beige animate-pulse" />
+                  <div className="aspect-[4/5] w-full rounded-lg bg-border animate-pulse" />
+                  <div className="mt-3 h-4 w-3/4 rounded bg-border animate-pulse" />
+                  <div className="mt-2 h-4 w-1/3 rounded bg-border animate-pulse" />
                 </div>
               ))}
             </div>
           ) : filteredProducts.length > 0 ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${activeCategory}-${activeFamily}-${activeOrigin}-${activeBrand}-${activeAudience}-${activeKind}-${activeBadge}-${activePreset}-${activeSort}-${search}-${selectedNotes.join("-")}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8"
-              >
-                {filteredProducts.map((product, i) => (
-                  <ProductCard key={product.id} product={product as unknown as Product} index={i} />
-                ))}
-              </motion.div>
-            </AnimatePresence>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredProducts.map((product, i) => (
+                <ProductCard key={product.id} product={product as unknown as Product} index={i} />
+              ))}
+            </div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="py-16 text-center rounded-3xl border border-neutral-300/80 bg-white/90 backdrop-blur-md shadow-2xs max-w-lg mx-auto"
-            >
-              <Filter className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
-              <h3 className="text-xl font-semibold text-neutral-900 mb-1">
+            <div className="py-12 text-center rounded-lg border border-border bg-card/50 max-w-lg mx-auto">
+              <Filter className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+              <h3 className="text-xl font-semibold text-foreground mb-1">
                 {apiProducts.length === 0 ? "The shelves are being stocked" : "No attars found"}
               </h3>
-              <p className="text-neutral-500 font-light text-xs max-w-xs mx-auto mb-6">
+              <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-6">
                 {apiProducts.length === 0
                   ? "No live products in the catalogue yet. New attars appear here automatically once added in admin."
                   : "No creations match this combination in the current catalog."}
@@ -783,12 +761,12 @@ export default function ShopPage() {
                   setSelectedNotes([]);
                   navigate("/shop");
                 }}
-                className="btn-primary shadow-md"
+                className="btn-primary"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset All Filters</span>
               </button>
-            </motion.div>
+            </div>
           )}
         </div>
           </div>

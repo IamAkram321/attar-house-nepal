@@ -52,7 +52,7 @@ export default function ContactPage() {
     );
 
     setTimeout(() => {
-      window.location.href = `mailto:concierge@ayeshafragrances.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:hello@attarhousenepal.com?subject=${subject}&body=${body}`;
       setIsSubmitting(false);
       setSubmitted(true);
       toast({ 
@@ -228,10 +228,10 @@ export default function ContactPage() {
                     Private Concierge
                   </h3>
                   <a
-                    href="mailto:concierge@ayeshafragrances.com"
+                    href="mailto:hello@attarhousenepal.com"
                     className="inline-flex items-center gap-1 text-base font-serif text-neutral-900 hover:text-[#8C6D37] transition-colors font-normal"
                   >
-                    <span>concierge@ayeshafragrances.com</span>
+                    <span>hello@attarhousenepal.com</span>
                     <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </a>
                 </div>

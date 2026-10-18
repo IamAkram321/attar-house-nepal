@@ -193,7 +193,7 @@ export function ProcessTimeline() {
                   </div>
 
                   <div className="pt-2 text-[11px] text-neutral-500 font-mono flex justify-between items-center border-t border-neutral-800">
-                    <span>Ayesha Fragrances Standard</span>
+                    <span>Attar House Nepal Standard</span>
                     <span className="text-neutral-400">Step {activeStep + 1} of 5</span>
                   </div>
                 </div>

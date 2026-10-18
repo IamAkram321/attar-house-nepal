@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { UserPlus, X, Trash2 } from "lucide-react";
+import { useToast } from '@/hooks/use-toast';
 
 type RoleType = 
   | "SUPER_ADMIN" 
@@ -60,6 +61,7 @@ export default function AdminTeamPage() {
     permissions: DEFAULT_ROLE_PERMISSIONS.PRODUCTION_MANAGER,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const apiUrl = import.meta.env.VITE_API_URL || "";
 
@@ -74,6 +76,7 @@ export default function AdminTeamPage() {
       setMembers(data);
     } catch (err: any) {
       setError(err.message || "An error occurred");
+      toast({ title: "Error", description: err.message || "Failed to fetch team members", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -115,8 +118,9 @@ export default function AdminTeamPage() {
         permissions: DEFAULT_ROLE_PERMISSIONS.PRODUCTION_MANAGER,
       });
       fetchTeam();
+      toast({ title: "Team member added", description: `${formData.name} has been added to the team.` });
     } catch (err: any) {
-      alert(err.message || "Error adding team member");
+      toast({ title: "Error", description: err.message || "Failed to add team member", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -150,7 +154,7 @@ export default function AdminTeamPage() {
         prev.map((m) => (m.id === userId ? { ...m, permissions: updated } : m))
       );
     } catch (err: any) {
-      alert(err.message || "Error updating permissions");
+      toast({ title: "Error", description: err.message || "Failed to update permissions", variant: "destructive" });
     }
   };
 
@@ -166,8 +170,9 @@ export default function AdminTeamPage() {
       if (!res.ok) throw new Error("Failed to update user role");
 
       fetchTeam();
+      toast({ title: "Role updated", description: `User role changed to ${newRole}.` });
     } catch (err: any) {
-      alert(err.message || "Error updating role");
+      toast({ title: "Error", description: err.message || "Failed to update role", variant: "destructive" });
     }
   };
 
@@ -189,7 +194,7 @@ export default function AdminTeamPage() {
 
       fetchTeam();
     } catch (err: any) {
-      alert(err.message || "Error removing team member");
+      toast({ title: "Error", description: err.message || "Error removing team member", variant: "destructive" });
     }
   };
 

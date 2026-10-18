@@ -46,14 +46,14 @@ export default function CollectionDetailPage() {
 
   if (isLoading && !collection) {
     return (
-      <div className="pt-36 pb-24 bg-ivory min-h-screen">
-        <div className="container mx-auto px-6 md:px-12 max-w-7xl">
+      <div className="pt-12 pb-24 bg-background text-foreground min-h-screen">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="max-w-3xl space-y-4 mb-12 animate-pulse">
-            <div className="h-4 bg-neutral-200 w-32 rounded-full" />
-            <div className="h-10 bg-neutral-200 w-2/3 rounded-lg" />
-            <div className="h-5 bg-neutral-200 w-full rounded" />
+            <div className="h-4 bg-border w-32 rounded-full" />
+            <div className="h-10 bg-border w-2/3 rounded-lg" />
+            <div className="h-5 bg-border w-full rounded" />
           </div>
-          <div className="animate-pulse rounded-xl bg-neutral-200 aspect-[21/9] w-full mb-16" />
+          <div className="animate-pulse rounded-lg bg-border aspect-[21/9] w-full mb-16" />
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse space-y-4">
@@ -98,7 +98,7 @@ export default function CollectionDetailPage() {
   }
 
   return (
-    <div className="relative pt-36 md:pt-40 pb-28 md:pb-36 bg-ivory text-neutral-900 min-h-screen overflow-hidden selection:bg-brass/20 selection:text-neutral-900">
+    <div className="pt-12 pb-24 bg-background text-foreground min-h-screen">
       
       {/* Background Ambience */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

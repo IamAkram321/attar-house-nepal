@@ -235,7 +235,7 @@ router.post("/payment/qr/generate", (req: Request, res: Response): void => {
       qrImageUrl:
         "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" +
         encodeURIComponent(`PAYMENT:Order#${orderId}-NPR${amount}`),
-      accountName: "AYESHA FRAGRANCES",
+      accountName: "ATTAR HOUSE NEPAL",
       instructions: "Scan using any Mobile Banking App, Fonepay, eSewa, or Khalti to settle consignment.",
     });
   } catch (err) {

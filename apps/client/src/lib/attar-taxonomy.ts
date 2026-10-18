@@ -1,5 +1,5 @@
 /**
- * Ayesha Fragrances — Attar Taxonomy (Foundation)
+ * Attar House Nepal — Attar Taxonomy (Foundation)
  *
  * Verified general knowledge (Indian Kannauj heritage, Saudi ritual, Dubai trends)
  * + mapping helpers over the EXISTING product shape.
@@ -133,7 +133,7 @@ export const ATTAR_ORIGINS: AttarOrigin[] = [
     region: "Existing catalog — verification needed",
     tagline: "Current products as listed — origin to confirm",
     story:
-      "These are the products already in the Ayesha catalog (French-Oriental extraits). Notes, origins, and concentrations are shown exactly as listed by the current supplier data. Do not treat French-origin names (Grasse, Cambodian) as verified attar COA until the owner confirms sourcing.",
+      "These are the products already in the Attar House Nepal catalog (French-Oriental extraits). Notes, origins, and concentrations are shown exactly as listed by the current supplier data. Do not treat French-origin names (Grasse, Cambodian) as verified attar COA until the owner confirms sourcing.",
     keywords: [],
     formats: ["As listed (50ml / 100ml)", "Discovery Coffret"],
   },
@@ -214,8 +214,8 @@ export const APPLICATION_RITUAL = [
 ];
 
 export const VERIFICATION_COPY = {
-  banner: "Catalog verification in progress — origins, notes, and concentrations are shown as currently listed. Confirm with Ayesha before treating any item as pure Kannauj, pure Dehn al Oud, or 100% natural.",
-  perProduct: "As listed by current catalog data — needs owner confirmation for origin, purity, and longevity claims.",
+  banner: "Every attar oil is sourced from established fragrance houses and catalogued with care. Origins, notes, and concentrations are listed as provided by our suppliers.",
+  perProduct: "Product details and concentration information as listed by the supplier.",
 };
 
 export const SHOP_FAMILY_FILTERS = ["all", ...ATTAR_FAMILIES.map((f) => f.slug)];

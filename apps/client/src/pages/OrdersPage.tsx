@@ -74,16 +74,16 @@ export default function OrdersPage() {
 
   if (!authLoading && !user) {
     return (
-      <div className="pt-36 lg:pt-40 pb-24 bg-ivory min-h-screen">
+      <div className="pt-12 lg:pt-16 pb-24 bg-background min-h-screen">
         <div className="mx-auto max-w-xl px-4 sm:px-6 text-center">
           <p className="eyebrow justify-center">My account</p>
-          <h1 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight text-coal">
+          <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-coal">
             Sign in to view your orders
           </h1>
-          <p className="mt-3 text-coal/60">
+          <p className="mt-2 text-sm text-coal/60">
             You'll need an account to see your order history.
           </p>
-          <Link href="/login?next=/orders" className="btn-primary mt-8">
+          <Link href="/login?next=/orders" className="btn-primary mt-6">
             Sign In
           </Link>
         </div>
@@ -92,12 +92,12 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="pt-36 lg:pt-40 pb-24 bg-ivory text-coal min-h-screen">
+    <div className="pt-12 lg:pt-16 pb-24 bg-background text-coal min-h-screen">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <p className="eyebrow">My account</p>
-            <h1 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Your Orders</h1>
+            <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Your Orders</h1>
             <p className="mt-2 text-sm sm:text-base text-coal/60">
               {isLoading || authLoading
                 ? 'Fetching your order history…'
@@ -150,10 +150,10 @@ export default function OrdersPage() {
                   <li key={order.id}>
                     <Link
                       href={`/orders/${order.id}`}
-                      className="card-flat card-hover group flex items-center gap-4 sm:gap-5 p-5 sm:p-6"
+                      className="card-flat flex items-center gap-4 sm:gap-5 p-5 sm:p-6"
                       aria-label={`Track order ${order.id}, ${STATUS_LABEL[key] ?? order.status}, ${formatTotal(order.total)}`}
                     >
-                      <span className="flex items-center justify-center w-12 h-12 rounded-xl bg-pine text-ivory text-sm font-semibold shrink-0">
+                      <span className="flex items-center justify-center w-12 h-12 rounded-lg bg-pine text-ivory text-sm font-semibold shrink-0">
                         #{order.id}
                       </span>
                       <span className="flex-1 min-w-0">

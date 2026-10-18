@@ -84,9 +84,7 @@ export default function LoginPage() {
 
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
-      window.location.href = next && next.startsWith("/")
-        ? next
-        : data.user?.role === 'ADMIN' || data.user?.role === 'SUPER_ADMIN' ? '/admin' : '/';
+      window.location.href = next && next.startsWith("/") ? next : isAdmin ? '/admin' : '/';
     } catch {
       toast({ title: 'Something went wrong. Please try again.', variant: 'destructive' });
     } finally {
@@ -103,14 +101,14 @@ export default function LoginPage() {
     'w-full border border-border/80 bg-background/50 focus:bg-background pl-10 pr-10 py-3 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm placeholder:text-muted-foreground/50';
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-background pt-36 lg:pt-36">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-background pt-6 lg:pt-0">
       
       {/* Left Brand Showcase Section (Desktop) */}
-      <div className="hidden lg:flex lg:col-span-5 xl:col-span-6 bg-muted/20 border-r border-border/60 p-12 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:col-span-5 xl:col-span-6 bg-[#FAF8F5] border-r border-border/60 p-12 flex-col justify-between relative overflow-hidden">
         
         {/* Subtle Ambient Glow */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#C5A265]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#C5A265]/5 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Header Link */}
         <div className="relative z-10 pt-4">
@@ -121,8 +119,8 @@ export default function LoginPage() {
 
         {/* Hero Branding Content */}
         <div className="relative z-10 max-w-md my-auto py-8 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
-            <Sparkles className="w-3.5 h-3.5" /> Premium Experience
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C5A265]/10 border border-[#C5A265]/30 text-[#8C6D37] text-xs font-medium">
+            <Sparkles className="w-3 h-3" /> Attar House Nepal
           </div>
           
           <h2 className="font-serif text-4xl xl:text-5xl font-bold tracking-tight text-foreground leading-tight">
@@ -170,7 +168,10 @@ export default function LoginPage() {
           
           {/* Logo & Headline Header */}
           <div className="text-center space-y-2">
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-foreground">Welcome back</h1>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C5A265]/10 border border-[#C5A265]/30 text-[#8C6D37] text-xs font-medium">
+              <Sparkles className="w-3 h-3" /> Attar House Nepal
+            </div>
+            <h1 className="font-serif text-3xl font-bold tracking-tight text-foreground">Welcome Back</h1>
             <p className="text-sm text-muted-foreground">
               Enter your credentials to access your account dashboard
             </p>
@@ -183,7 +184,7 @@ export default function LoginPage() {
             <button
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 rounded-xl border border-border/80 bg-background/80 px-4 py-3 text-sm font-medium text-foreground transition-all hover:bg-muted/60 hover:border-border disabled:opacity-60 shadow-sm"
+              className="w-full flex items-center justify-center gap-3 rounded-xl border border-border/80 bg-background/80 px-4 py-3 text-sm font-medium text-foreground transition-all hover:bg-[#C5A265]/10 hover:border-[#C5A265] disabled:opacity-60 shadow-sm"
             >
               <GoogleIcon />
               <span>Continue with Google</span>
@@ -226,7 +227,7 @@ export default function LoginPage() {
                   <label className="block text-[11px] font-semibold uppercase tracking-wider text-foreground/80">
                     Password
                   </label>
-                  <Link href="/forgot-password" className="text-xs text-primary hover:underline font-medium">
+                  <Link href="/forgot-password" className="text-xs text-[#C5A265] hover:underline font-medium">
                     Forgot password?
                   </Link>
                 </div>
@@ -261,7 +262,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-foreground text-background py-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-primary transition-all shadow-md hover:shadow-lg disabled:opacity-60 flex items-center justify-center gap-2 mt-2"
+                className="w-full bg-[#C5A265] text-neutral-900 py-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-[#B79A62] transition-all shadow-md hover:shadow-lg disabled:opacity-60 flex items-center justify-center gap-2 mt-2"
               >
                 {isSubmitting ? (
                   <>
@@ -281,7 +282,7 @@ export default function LoginPage() {
           {/* Footer Signup Link */}
           <p className="text-center text-sm text-muted-foreground">
             Don't have an account yet?{' '}
-            <Link href="/signup" className="text-primary hover:underline font-semibold">
+            <Link href="/signup" className="text-[#C5A265] hover:underline font-semibold">
               Create an account
             </Link>
           </p>
@@ -289,11 +290,10 @@ export default function LoginPage() {
           {/* Terms & Policy Notice */}
           <p className="text-[11px] text-muted-foreground/70 text-center leading-relaxed">
             By accessing Attar House Nepal, you agree to our{' '}
-            <Link href="/terms" className="underline hover:text-foreground">Terms of Service</Link>{' '}
+            <Link href="/terms" className="text-[#C5A265] hover:underline">Terms of Service</Link>{' '}
             and{' '}
-            <Link href="/privacy-policy" className="underline hover:text-foreground">Privacy Policy</Link>.
+            <Link href="/privacy-policy" className="text-[#C5A265] hover:underline">Privacy Policy</Link>.
           </p>
-
         </div>
       </div>
     </div>

@@ -14,7 +14,7 @@ export default function HomePage() {
   useAttarSEO(ATTAR_SEO.home.title, ATTAR_SEO.home.desc);
 
   return (
-    <div className="bg-ivory text-coal min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
       {/* Offset for the fixed full-width header (bar + nav) */}
       <div className="pt-[118px] md:pt-[112px]">
         <HeroCarousel />

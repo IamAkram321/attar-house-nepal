@@ -1,5 +1,5 @@
 /**
- * Ayesha Fragrances — Store, social & marketplace config (EDITABLE)
+ * Attar House Nepal — Store, social & marketplace config (EDITABLE)
  * ===================================================================
  * Owner: fill exact address, hours, WhatsApp number, TikTok/Instagram
  * handles, and Daraz shop URL. Defaults are placeholders — do not

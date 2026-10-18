@@ -23,7 +23,7 @@ const sections = [
   },
   {
     title: '6. Patron Rights',
-    body: `You retain the absolute right to inspect, amend, or request the deletion of your personal contact records at any time by contacting our private concierge at concierge@ayeshafragrances.com.`,
+    body: `You retain the absolute right to inspect, amend, or request the deletion of your personal contact records at any time by contacting our private concierge at hello@attarhousenepal.com.`,
   },
   {
     title: '7. Revisions to This Policy',
@@ -58,8 +58,8 @@ export default function PrivacyPolicyPage() {
           <h3 className="font-serif text-xl font-normal text-neutral-900 mb-2">Questions Regarding Your Records?</h3>
           <p className="text-neutral-600 font-light text-sm leading-relaxed">
             Please direct all inquiries to{' '}
-            <a href="mailto:concierge@ayeshafragrances.com" className="text-[#8C6D37] underline font-medium">
-              concierge@ayeshafragrances.com
+            <a href="mailto:hello@attarhousenepal.com" className="text-[#8C6D37] underline font-medium">
+              hello@attarhousenepal.com
             </a>.
           </p>
         </div>

@@ -47,17 +47,14 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         : "6ml";
 
   return (
-    <article
-      className="group flex flex-col"
-      style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
-    >
+    <article className="flex flex-col">
       <Link href={productLink} className="block" aria-label={product.name}>
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-beige border border-coal/10 transition-all duration-300 group-hover:shadow-[0_12px_32px_rgba(18,56,47,0.12)] group-hover:border-pine/25 group-hover:-translate-y-0.5">
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-beige border border-coal/10">
           <AttarImage
             src={imageSrc}
             alt={product.name}
             eager={index < 4}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            className="h-full w-full object-cover"
           />
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
             {badges.includes("bestseller") && (

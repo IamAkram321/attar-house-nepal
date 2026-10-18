@@ -1,5 +1,5 @@
 /**
- * Ayesha Fragrances — Shipping & Payments config (EDITABLE DRAFT)
+ * Attar House Nepal — Shipping & Payments config (EDITABLE DRAFT)
  * =================================================================
  * Owner: edit fees and policies here. Per owner decision there is
  * currently NO free-delivery promise and NO complimentary vial offer.

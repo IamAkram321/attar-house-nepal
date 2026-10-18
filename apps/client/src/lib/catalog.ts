@@ -3,7 +3,7 @@ import { useListProducts } from "@workspace/api-client-react";
 import { deriveOrigin } from "./attar-taxonomy";
 
 /**
- * Ayesha Fragrances — catalog presentation layer.
+ * Attar House Nepal — catalog presentation layer.
  *
  * The products table has no dedicated brand / gender / type columns, so all
  * discovery metadata is derived from ADMIN-MANAGED fields (no inventory invented):
@@ -418,7 +418,7 @@ export function filterCatalog(products: CatalogProduct[], query: ShopQuery): Cat
     } else {
       list = list.filter((p) => {
         const b = getBrand(p);
-        return b ? b.toLowerCase() === query.brand!.toLowerCase() : query.brand!.toLowerCase() === "ayesha" && /ayesha/i.test(p.name);
+        return b ? b.toLowerCase() === query.brand!.toLowerCase() : false;
       });
     }
   }

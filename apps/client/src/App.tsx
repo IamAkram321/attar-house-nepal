@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
@@ -78,22 +78,6 @@ function RedirectToShop() {
   return <RouteLoader />;
 }
 
-function PageTransition({ children, transitionKey }: { children: React.ReactNode; transitionKey: string }) {
-  const shouldReduceMotion = useReducedMotion();
-
-  return (
-    <motion.div
-      key={transitionKey}
-      initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
-      transition={{ duration: shouldReduceMotion ? 0.15 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -149,10 +133,8 @@ function AppContent() {
       {!isNavbarDisabled && <Navbar />}
 
       <main className="flex-1">
-        <AnimatePresence mode="wait" initial={false}>
-          <PageTransition transitionKey={location}>
-            <Suspense fallback={<RouteLoader />}>
-              <Switch location={location}>
+        <Suspense fallback={<RouteLoader />}>
+          <Switch location={location}>
                 <Route path="/" component={HomePage} />
                 <Route path="/shop" component={ShopPage} />
                 <Route path="/custom-studio" component={RedirectToShop} />
@@ -184,12 +166,13 @@ function AppContent() {
                 <Route path="/returns" component={ReturnsPage} />
               </Switch>
             </Suspense>
-          </PageTransition>
-        </AnimatePresence>
-      </main>
+          </main>
 
       {/* Footer stays rendered on ALL pages including login and signup */}
       <Footer />
+
+      {/* Global toast notification system (mounted once, app-wide) */}
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

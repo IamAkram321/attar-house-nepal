@@ -323,10 +323,10 @@
   }
   /* Flat clean card */
   .card-flat {
-    @apply rounded-xl border border-coal/10 bg-white shadow-[0_1px_2px_rgba(35,38,36,0.06)];
+    @apply rounded-lg border border-coal/10 bg-white shadow-[0_1px_2px_rgba(35,38,36,0.06)];
   }
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-[0_12px_32px_rgba(18,56,47,0.12)] hover:-translate-y-0.5 hover:border-brass/40;
+    @apply transition-colors hover:border-brass/40;
   }
   .input-af {
     @apply w-full rounded-lg border border-coal/15 bg-white px-4 py-3 text-sm text-coal placeholder:text-coal/40 focus:outline-none focus:border-pine focus:ring-2 focus:ring-pine/15 transition-all;
@@ -346,12 +346,5 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
-  }
-  .hover-elevate:not(.no-default-hover-elevate),
-  .active-elevate:not(.no-default-active-elevate),
-  .hover-elevate-2:not(.no-default-hover-elevate),
-  .active-elevate-2:not(.no-default-active-elevate) {
-    position: relative;
-    z-index: 0;
   }
 }

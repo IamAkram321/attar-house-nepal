@@ -56,7 +56,7 @@ export function WhatWeCreate() {
             />
             
             <p className="text-neutral-600 text-sm sm:text-base font-light leading-relaxed max-w-md">
-              Each fragrance at Aaisha Fragrances belongs to an intentional olfactory realm—blended without compromise using the finest wild-harvested botanicals and aged resinous woods.
+              Each fragrance at Attar House Nepal belongs to an intentional olfactory realm—blended without compromise using the finest wild-harvested botanicals and aged resinous woods.
             </p>
 
             <div className="pt-2">

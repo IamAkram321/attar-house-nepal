@@ -37,7 +37,7 @@ function SectionHead({
     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
       <div className="max-w-xl">
         <p className="eyebrow">{eyebrow}</p>
-        <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight text-coal">{title}</h2>
+        <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-coal">{title}</h2>
         {copy && <p className="mt-2 text-sm sm:text-base text-coal/60 leading-relaxed">{copy}</p>}
       </div>
       {href && (
@@ -66,7 +66,7 @@ function ProductRow({
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="aspect-[4/5] rounded-xl bg-beige animate-pulse" />
+          <div key={i} className="aspect-[4/5] rounded-lg bg-beige animate-pulse" />
         ))}
       </div>
     );
@@ -87,11 +87,11 @@ function ProductRow({
 
 export function BestsellingAttars() {
   return (
-    <section className="section-pad py-6 sm:py-8">
+    <section className="section-pad py-8 sm:py-10">
       <SectionHead
         eyebrow="Bestsellers"
         title="Most loved attars"
-        copy="The oils our customers reach for again and again — chosen by the people who wear them."
+        copy="The oils our customers reach for again and again."
         href={buildShopHref({ preset: "bestsellers" })}
       />
       <ProductRow
@@ -116,9 +116,9 @@ export function ShopByBrand() {
   return (
     <section className="section-pad py-14 sm:py-16">
       <SectionHead
-        eyebrow="Shop by brand"
-        title="Imported attar houses"
-        copy="Great houses of attar, from heritage Kannauj to modern Dubai — find the house that speaks to you."
+        eyebrow="Imported attar houses"
+        title="Shop by brand"
+        copy="Great houses of attar, from heritage Kannauj to modern Dubai."
         href="/brands"
       />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -126,7 +126,7 @@ export function ShopByBrand() {
           <Link
             key={b}
             href={buildShopHref({ brand: b })}
-            className="card-flat card-hover p-6 flex flex-col gap-1"
+            className="card-flat p-6 flex flex-col gap-1"
           >
             <span className="text-base font-semibold text-coal">{b}</span>
             <span className="text-xs text-coal/50">{counts[b] ?? 0} products</span>
@@ -148,12 +148,12 @@ export function ExploreByFamily() {
   const shown = families.length > 0 ? families : SHOP_FAMILIES.slice(0, 8);
 
   return (
-    <section className="bg-cream border-y border-line">
+    <section className="border-y border-line">
       <div className="section-pad py-14 sm:py-16">
         <SectionHead
           eyebrow="Fragrance families"
           title="Explore by family"
-          copy="Eight moods, one ritual — follow musk's softness, oud's depth or rose's romance to the oil that feels like you."
+          copy="Follow musk's softness, oud's depth or rose's romance to the oil that feels like you."
           href={buildShopHref({ kind: "attar" })}
         />
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -163,7 +163,7 @@ export function ExploreByFamily() {
               <Link
                 key={f.slug}
                 href={buildShopHref({ kind: "attar", family: f.slug })}
-                className="rounded-xl border border-coal/10 bg-white p-5 hover:border-pine/40 hover:shadow-md transition-all"
+                className="rounded-lg border border-coal/10 bg-white p-5 hover:border-pine/40 transition-colors"
               >
                 <span className="text-sm font-semibold text-coal">{f.name}</span>
                 <span className="block mt-0.5 text-xs text-coal/50">{f.tagline}</span>
@@ -215,7 +215,7 @@ export function OffersAndCombos() {
       <SectionHead
         eyebrow="Offers"
         title="Special offers and combo deals"
-        copy="Little mercies for the devoted — genuine savings on gift sets and selected oils, while they last."
+        copy="Genuine savings on gift sets and selected oils, while they last."
         href="/offers"
       />
       {!hasAny ? (
@@ -246,7 +246,7 @@ export function CraftPreview() {
             <div className="mt-3 h-4 w-full rounded bg-beige animate-pulse" />
             <div className="mt-2 h-4 w-2/3 rounded bg-beige animate-pulse" />
           </div>
-          <div className="rounded-xl bg-beige animate-pulse min-h-[280px]" />
+          <div className="rounded-lg bg-beige animate-pulse min-h-[280px]" />
         </div>
       </section>
     );
@@ -259,7 +259,7 @@ export function CraftPreview() {
       <div className="grid lg:grid-cols-2 gap-6 items-stretch">
         <div className="card-flat p-8 sm:p-10 flex flex-col justify-center">
           {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-          <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">
+          <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
             {section.title}
           </h2>
           {section.description && (
@@ -283,7 +283,7 @@ export function CraftPreview() {
           )}
         </div>
         {section.image && (
-          <div className="relative overflow-hidden rounded-xl border border-coal/10">
+          <div className="relative overflow-hidden rounded-lg border border-coal/10">
             <img
               src={cloudinarySrc(section.image, 1200)}
               alt={section.title}
@@ -320,7 +320,7 @@ export function TrustSection() {
     <section className="bg-pine text-ivory">
       <div className="section-pad py-14 sm:py-16">
         <p className="eyebrow eyebrow-light">Importer &amp; retailer</p>
-        <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+        <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-white">
           Authentic imports, shelved with care
         </h2>
         <p className="mt-3 max-w-2xl text-sm sm:text-base text-white/70 leading-relaxed">
@@ -332,7 +332,7 @@ export function TrustSection() {
         {testimonials.length > 0 ? (
           <div className="mt-8 grid sm:grid-cols-3 gap-4">
             {testimonials.map((t: any) => (
-              <figure key={t.id} className="rounded-xl bg-white/5 border border-white/10 p-6">
+              <figure key={t.id} className="rounded-lg bg-white/5 border border-white/10 p-6">
                 <blockquote className="text-sm text-white/85 leading-relaxed">“{t.text}”</blockquote>
                 <figcaption className="mt-4 text-xs uppercase tracking-[0.14em] text-white/60">
                   {t.name}
@@ -348,7 +348,7 @@ export function TrustSection() {
               ["Verified shelves", "Brand, family and gender come from admin-managed tags."],
               ["Kathmandu based", "Imported attar houses, shelved in Nepal."],
             ].map(([t, d]) => (
-              <div key={t} className="rounded-xl bg-white/5 border border-white/10 p-6">
+              <div key={t} className="rounded-lg bg-white/5 border border-white/10 p-6">
                 <p className="font-semibold text-white">{t}</p>
                 <p className="mt-1 text-white/65">{d}</p>
               </div>

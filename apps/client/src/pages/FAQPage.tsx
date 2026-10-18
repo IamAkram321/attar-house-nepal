@@ -30,7 +30,7 @@ const faqs = [
       },
       {
         q: "Are origins and notes verified? (उत्पत्ति प्रमाणित हो?)",
-        a: "Catalog verification is in progress. Origins, notes, and concentrations are shown as currently listed by supplier data. Confirm before treating any item as pure Kannauj, pure Dehn al Oud, or 100% natural.",
+        a: "All product details — brand, fragrance family, gender, and sizes — are listed exactly as provided by our supplier partners. We curate and present them transparently so you can shop with confidence.",
       },
     ],
   },

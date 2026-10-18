@@ -1,5 +1,5 @@
 /**
- * Ayesha Fragrances — Bilingual microcopy (EDITABLE)
+ * Attar House Nepal — Bilingual microcopy (EDITABLE)
  * Keep English primary; Nepali as warm secondary line.
  * Owner: edit freely. No machine claims, just hospitality copy.
  */
