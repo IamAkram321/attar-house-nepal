@@ -63,8 +63,14 @@ export default function AboutPage() {
               transition={{ duration: 0.2 }}
               className="inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/90 border border-[#C5A265]/30 shadow-xs backdrop-blur-md"
             >
-              <div className="w-8 h-8 rounded-full border border-[#C5A265] bg-neutral-950 flex items-center justify-center">
-                <span className="font-serif text-[10px] tracking-wider text-[#C5A265] font-semibold">AH</span>
+              <div className="w-8 h-8 rounded-full border border-[#C5A265] bg-neutral-950 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/images/logo.png"
+                  alt=""
+                  aria-hidden
+                  draggable={false}
+                  className="h-full w-full object-contain"
+                />
               </div>
               <div className="h-6 w-px bg-neutral-200" />
               <div className="flex items-center gap-2">

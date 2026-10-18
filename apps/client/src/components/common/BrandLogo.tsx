@@ -17,12 +17,17 @@ export function BrandLogo({
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
       <div
-        className={`flex items-center justify-center rounded-lg bg-pine text-ivory font-semibold ${
-          isSmall ? "w-8 h-8 text-xs" : isLarge ? "w-11 h-11 text-base" : "w-10 h-10 text-sm"
+        className={`flex items-center justify-center rounded-lg bg-pine shrink-0 ${
+          isSmall ? "w-8 h-8" : isLarge ? "w-11 h-11" : "w-10 h-10"
         }`}
-        aria-hidden
       >
-        <span className="tracking-tight">AH</span>
+        <img
+          src="/images/logo.png"
+          alt=""
+          aria-hidden
+          draggable={false}
+          className="h-full w-full object-contain"
+        />
       </div>
 
       <div className="flex flex-col leading-none">
