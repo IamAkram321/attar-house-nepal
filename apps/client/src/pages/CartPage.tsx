@@ -188,8 +188,8 @@ export default function CartPage() {
                 </div>
 
                 <div className="flex justify-between items-center text-muted-foreground/60">
-                  <span className="uppercase tracking-wider">Estimated Shipping</span>
-                  <span>Calculated at checkout · <Link href="/shipping" className="underline">zones</Link></span>
+                  <span className="uppercase tracking-wider">Delivery</span>
+                  <span>Separate · paid to driver · <Link href="/shipping" className="underline">zones</Link></span>
                 </div>
               </div>
 

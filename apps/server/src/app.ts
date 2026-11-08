@@ -14,6 +14,22 @@ import "./routes/auth";
 
 const app: Express = express();
 
+// Render exposes RENDER=true / RENDER_EXTERNAL_URL. Treat that as production
+// even if NODE_ENV was not configured, so cross-site secure cookies are used.
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  process.env.RENDER === "true" ||
+  Boolean(process.env.RENDER_EXTERNAL_URL);
+
+function splitOrigins(value: string | undefined): string[] {
+  if (!value) return [];
+
+  return value
+    .split(",")
+    .map((url) => url.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+}
+
 app.set("trust proxy", 1);
 
 app.use(
@@ -42,17 +58,18 @@ app.use(
   })
 );
 
-const customAllowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
-      .map((url) => url.trim().replace(/\/$/, ""))
-      .filter(Boolean)
-  : [];
+const frontendOrigins = splitOrigins(process.env.FRONTEND_URL);
+const customAllowedOrigins = splitOrigins(process.env.ALLOWED_ORIGINS);
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.trim().replace(/\/$/, "")] : []),
-  ...customAllowedOrigins,
-];
+const allowedOrigins = Array.from(
+  new Set([
+    "http://localhost:5173",
+    // FRONTEND_URL may be a comma-separated list. Fall back to APP_BASE_URL
+    // for older deployments that still use that variable name.
+    ...(frontendOrigins.length ? frontendOrigins : splitOrigins(process.env.APP_BASE_URL)),
+    ...customAllowedOrigins,
+  ])
+);
 
 app.use(
   cors({
@@ -79,11 +96,32 @@ app.use(cookieParser());
 
 const PgSession = connectPgSimple(session);
 
-const isProduction = process.env.NODE_ENV === "production";
-// Isolated attar project: cookie domain comes ONLY from COOKIE_DOMAIN env (no inherited default).
-const cookieDomain = process.env.COOKIE_DOMAIN !== undefined
-  ? (process.env.COOKIE_DOMAIN || undefined)
-  : undefined;
+// Isolated attar project: cookie domain comes ONLY from COOKIE_DOMAIN env
+// (no inherited default). Leave it empty for Vercel -> Render deployments so
+// the browser keeps the cookie on the Render backend host.
+function getCookieDomain(): string | undefined {
+  const configured = process.env.COOKIE_DOMAIN?.trim();
+  if (!configured) return undefined;
+
+  const normalized = configured.replace(/^\.+/, "").toLowerCase();
+
+  // Setting Domain=.vercel.app / .onrender.com is rejected or ignored by
+  // browsers and would silently drop the session cookie. A host-only cookie
+  // (empty COOKIE_DOMAIN) is the correct cross-site Vercel <-> Render setup.
+  if (
+    normalized === "vercel.app" ||
+    normalized.endsWith(".vercel.app") ||
+    normalized === "onrender.com" ||
+    normalized.endsWith(".onrender.com")
+  ) {
+    console.warn("[session] Ignoring COOKIE_DOMAIN on a shared hosting domain; leave COOKIE_DOMAIN empty.");
+    return undefined;
+  }
+
+  return configured;
+}
+
+const cookieDomain = getCookieDomain();
 
 app.use(
   session({

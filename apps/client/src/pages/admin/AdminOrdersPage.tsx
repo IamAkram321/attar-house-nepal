@@ -52,12 +52,15 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function PaymentBadge({ method }: { method?: string }) {
-  const isQr = method?.toLowerCase() === 'qr';
+  const normalized = method?.toLowerCase();
+  const isQr = normalized === 'qr' || normalized === 'esewa' || normalized === 'khalti';
+  const qrLabel = normalized === 'esewa' ? 'eSewa QR' : normalized === 'khalti' ? 'Khalti QR' : 'QR Pay';
+
   return (
     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
       {isQr ? (
         <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-semibold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-          <QrCode className="h-3 w-3" /> QR Pay
+          <QrCode className="h-3 w-3" /> {qrLabel}
         </span>
       ) : (
         <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">

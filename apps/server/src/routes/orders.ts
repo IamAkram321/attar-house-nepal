@@ -12,6 +12,7 @@ const uploadProof = createCloudinaryUploader(
 
 const CART_SESSION_COOKIE = "cart_session_id";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const QR_PAYMENT_METHODS = new Set(["qr", "esewa", "khalti"]);
 
 function validateOrderBody(body: unknown): { error: string } | {
   customerName: string;
@@ -35,8 +36,8 @@ function validateOrderBody(body: unknown): { error: string } | {
 
   const customerPhone = typeof b.customerPhone === "string" ? b.customerPhone.trim() : undefined;
   const notes = typeof b.notes === "string" ? b.notes.trim() : undefined;
-  const paymentMethod = typeof b.paymentMethod === "string" ? b.paymentMethod.trim() : "cash_on_delivery";
-  const transactionId = typeof b.transactionId === "string" ? b.transactionId.trim() : undefined;
+  const paymentMethod = typeof b.paymentMethod === "string" ? b.paymentMethod.trim().toLowerCase() : "cash_on_delivery";
+  const transactionId = typeof b.transactionId === "string" && b.transactionId.trim() ? b.transactionId.trim() : undefined;
 
   return { customerName, customerEmail, customerPhone, shippingAddress, notes, paymentMethod, transactionId };
 }
@@ -82,8 +83,8 @@ router.post("/orders", (req: Request, res: Response): void => {
       // multer-storage-cloudinary populates req.file.path with the secure HTTPS Cloudinary URL
       const paymentProofUrl = req.file ? req.file.path : null;
 
-      if (paymentMethod === "qr" && (!transactionId || !req.file)) {
-        res.status(400).json({ error: "Transaction ID and payment screenshot are required for QR payments." });
+      if (QR_PAYMENT_METHODS.has(paymentMethod) && !req.file) {
+        res.status(400).json({ error: "Payment screenshot is required for QR payments." });
         return;
       }
 

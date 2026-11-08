@@ -4,9 +4,9 @@
  * Owner: edit fees and policies here. Per owner decision there is
  * currently NO free-delivery promise and NO complimentary vial offer.
  *
- * Backend note: POST /api/orders currently totals cart items only —
- * shipping is shown as an estimate and appended to order notes.
- * Concierge confirms final delivery fee. No schema change made.
+ * Checkout note: POST /api/orders totals cart items only. Delivery is
+ * arranged separately via Pathao/Indrive and paid directly by the receiver
+ * to the driver based on the actual fare. No schema change made.
  */
 
 export interface ShippingZone {
@@ -21,19 +21,19 @@ export const ATTAR_SHIPPING_ZONES: ShippingZone[] = [
   {
     id: "valley",
     label: "Kathmandu Valley",
-    detail: "NPR 99 estimate — EDIT ME",
+    detail: "Delivered via Pathao/Indrive",
     fee: 99,
   },
   {
     id: "outside",
     label: "Outside Valley (Nepal)",
-    detail: "PROPOSED: flat NPR 149, COD available — EDIT ME",
+    detail: "Delivered via Pathao/Indrive",
     fee: 149,
   },
   {
     id: "international",
     label: "International",
-    detail: "On request via concierge — EDIT ME",
+    detail: "Concierge will confirm delivery arrangement",
     fee: 0,
   },
 ];
@@ -48,8 +48,8 @@ export function quoteShipping(zoneId: string, subtotal: number): { fee: number; 
 }
 
 export const PAYMENT_GUIDE = {
-  cod: "Cash on Delivery — pay on receipt. Available Valley + outside (proposed).",
-  qr: "Fonepay / Mobile Banking QR — scan, pay, upload screenshot + transaction ID.",
-  esewa: "eSewa — TEST MODE until merchant keys are set (backend returns mock redirect). Do not claim live until verified.",
-  khalti: "Khalti — TEST MODE until secret key is set (backend returns mock pidx). Do not claim live until verified.",
+  cod: "Cash on Delivery — pay the product amount on receipt. Delivery fare is paid separately to the driver.",
+  qr: "Fonepay / Mobile Banking QR — scan, pay, upload screenshot (transaction ID optional).",
+  esewa: "eSewa QR — scan, pay, upload screenshot (transaction ID optional).",
+  khalti: "Khalti QR — scan, pay, upload screenshot (transaction ID optional).",
 };

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import {
   ShieldCheck,
-  CreditCard,
   Truck,
   QrCode,
   CheckCircle2,
@@ -19,9 +18,40 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL } from '@/lib/api-url';
-import { ATTAR_SHIPPING_ZONES, quoteShipping, PAYMENT_GUIDE } from '@/lib/attar-shipping';
+import { ATTAR_SHIPPING_ZONES, PAYMENT_GUIDE } from '@/lib/attar-shipping';
 
 type PaymentMethod = 'cash_on_delivery' | 'esewa' | 'khalti' | 'qr';
+type QrPaymentMethod = 'qr' | 'esewa' | 'khalti';
+
+const QR_PAYMENT_DETAILS: Record<QrPaymentMethod, {
+  label: string;
+  image: string;
+  alt: string;
+  accountName: string;
+}> = {
+  qr: {
+    label: 'Fonepay / Mobile Banking',
+    image: '/images/payment_qr.jpeg',
+    alt: 'Fonepay mobile banking payment QR',
+    accountName: 'MD AKRAM',
+  },
+  esewa: {
+    label: 'eSewa',
+    image: '/images/esewa_qr.jpeg',
+    alt: 'eSewa payment QR',
+    accountName: 'MD AKRAM',
+  },
+  khalti: {
+    label: 'Khalti',
+    image: '/images/khalti_qr.jpeg',
+    alt: 'Khalti payment QR',
+    accountName: 'MD AKRAM',
+  },
+};
+
+function isQrPaymentMethod(method: PaymentMethod): method is QrPaymentMethod {
+  return method === 'qr' || method === 'esewa' || method === 'khalti';
+}
 
 interface QrData {
   orderId: number;
@@ -55,6 +85,11 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState<{ id: number; method: PaymentMethod } | null>(null);
   const [qrModalData, setQrModalData] = useState<QrData | null>(null);
+  const [qrImageErrors, setQrImageErrors] = useState<Record<QrPaymentMethod, boolean>>({
+    qr: false,
+    esewa: false,
+    khalti: false,
+  });
 
   const handleChange = (field: keyof typeof form) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -73,35 +108,10 @@ export default function CheckoutPage() {
     }
   };
 
-  const submitEsewaForm = (url: string, formData: Record<string, string>) => {
-    const formEl = document.createElement('form');
-    formEl.method = 'POST';
-    formEl.action = url;
-
-    Object.entries(formData).forEach(([key, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = value;
-      formEl.appendChild(input);
-    });
-
-    document.body.appendChild(formEl);
-    formEl.submit();
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (paymentMethod === 'qr') {
-      if (!transactionId.trim()) {
-        toast({
-          title: 'Transaction ID Required',
-          description: 'Please enter your payment reference or transaction number.',
-          variant: 'destructive',
-        });
-        return;
-      }
+    if (isQrPaymentMethod(paymentMethod)) {
       if (!paymentProof) {
         toast({
           title: 'Payment Screenshot Required',
@@ -117,16 +127,17 @@ export default function CheckoutPage() {
     try {
       let res: Response;
 
-      const subtotalNow = cart?.subtotal ?? 0;
-      const ship = quoteShipping(shippingZone, subtotalNow);
-      const notesWithShipping = `${form.notes ?? ""}\n[Shipping zone: ${shippingZone} — ${ship.note}]`.trim();
+      const selectedZone = ATTAR_SHIPPING_ZONES.find((zone) => zone.id === shippingZone);
+      const notesWithDelivery = `${form.notes ?? ""}\n[Delivery zone: ${selectedZone?.label ?? shippingZone}. Delivery charge is separate and payable directly to the Pathao/Indrive driver based on the actual fare.]`.trim();
 
-      if (paymentMethod === 'qr' && paymentProof) {
+      if (isQrPaymentMethod(paymentMethod) && paymentProof) {
         const formData = new FormData();
         Object.entries(form).forEach(([key, val]) => formData.append(key, val));
-        formData.append('notes', notesWithShipping);
+        formData.append('notes', notesWithDelivery);
         formData.append('paymentMethod', paymentMethod);
-        formData.append('transactionId', transactionId.trim());
+        if (transactionId.trim()) {
+          formData.append('transactionId', transactionId.trim());
+        }
         formData.append('paymentProof', paymentProof);
 
         res = await fetch(`${API_URL}/api/orders`, {
@@ -141,7 +152,7 @@ export default function CheckoutPage() {
           credentials: 'include',
           body: JSON.stringify({
             ...form,
-            notes: notesWithShipping,
+            notes: notesWithDelivery,
             paymentMethod,
           }),
         });
@@ -157,55 +168,7 @@ export default function CheckoutPage() {
 
       refreshCart();
 
-      if (paymentMethod === 'cash_on_delivery' || paymentMethod === 'qr') {
-        setOrderPlaced({ id: data.id, method: paymentMethod });
-      } else if (paymentMethod === 'esewa') {
-        const esewaRes = await fetch(`${API_URL}/api/payment/esewa/initiate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ orderId: data.id, amount: data.total }),
-        });
-
-        const esewaData = await esewaRes.json().catch(() => ({}));
-
-        if (!esewaRes.ok) {
-          toast({ title: esewaData.error ?? 'Failed to initiate eSewa payment', variant: 'destructive' });
-          setIsSubmitting(false);
-          return;
-        }
-
-        if (esewaData.isMock && esewaData.redirectUrl) {
-          window.location.href = esewaData.redirectUrl;
-          return;
-        }
-
-        if (esewaData.esewaUrl && esewaData.formData) {
-          submitEsewaForm(esewaData.esewaUrl, esewaData.formData);
-        }
-      } else if (paymentMethod === 'khalti') {
-        const khaltiRes = await fetch(`${API_URL}/api/payment/khalti/initiate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            orderId: data.id,
-            amount: data.total,
-            customerName: form.customerName,
-            customerEmail: form.customerEmail,
-            customerPhone: form.customerPhone,
-          }),
-        });
-
-        const khaltiData = await khaltiRes.json().catch(() => ({}));
-
-        if (khaltiRes.ok && khaltiData.paymentUrl) {
-          window.location.href = khaltiData.paymentUrl;
-        } else {
-          toast({ title: khaltiData.error ?? 'Failed to launch Khalti payment', variant: 'destructive' });
-          setIsSubmitting(false);
-        }
-      }
+      setOrderPlaced({ id: data.id, method: paymentMethod });
     } catch (err: any) {
       console.error('[Checkout Error Details]:', err);
       toast({
@@ -287,6 +250,9 @@ export default function CheckoutPage() {
 
   const inputClasses =
     'w-full border border-input bg-background/50 focus:bg-background rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all shadow-sm placeholder:text-muted-foreground/60';
+
+  const qrMethod = isQrPaymentMethod(paymentMethod) ? paymentMethod : null;
+  const qrDetails = qrMethod ? QR_PAYMENT_DETAILS[qrMethod] : null;
 
   return (
     <div className="pt-12 pb-20 bg-background min-h-screen">
@@ -414,7 +380,9 @@ export default function CheckoutPage() {
                   </label>
                 ))}
               </div>
-              <p className="text-[11px] text-muted-foreground">Estimate only — concierge confirms delivery fee.</p>
+              <p className="text-[11px] text-muted-foreground">
+                Choose your area so we can arrange Pathao/Indrive delivery. The delivery fare is separate from your product total and is paid directly to the driver.
+              </p>
             </div>
 
             {/* Step 2: Payment Method */}
@@ -448,7 +416,7 @@ export default function CheckoutPage() {
                     />
                     <div>
                       <p className="text-sm font-semibold text-foreground">Cash on Delivery</p>
-                      <p className="text-xs text-muted-foreground">Pay with cash upon package receipt</p>
+                      <p className="text-xs text-muted-foreground">Pay the product amount in cash on receipt; delivery fare is paid separately to the driver</p>
                     </div>
                   </div>
                   <Truck className="w-5 h-5 text-muted-foreground" />
@@ -472,92 +440,11 @@ export default function CheckoutPage() {
                     />
                     <div>
                       <p className="text-sm font-semibold text-foreground">Fonepay / Mobile Banking QR</p>
-                      <p className="text-xs text-muted-foreground">Scan QR code using any mobile banking app</p>
+                      <p className="text-xs text-muted-foreground">{PAYMENT_GUIDE.qr}</p>
                     </div>
                   </div>
                   <QrCode className="w-5 h-5 text-accent" />
                 </label>
-
-                {/* Integrated QR Payment Interface */}
-                {paymentMethod === 'qr' && (
-                  <div className="mt-2 p-5 bg-muted/30 border border-border rounded-lg space-y-4">
-                    <div className="text-center space-y-3">
-                      <p className="text-xs font-bold uppercase tracking-wider text-accent">
-                        Scan & Pay with Mobile Banking / Wallet
-                      </p>
-
-                      <div className="bg-white p-3 rounded-lg border border-dashed border-accent/40 shadow-sm inline-flex flex-col items-center justify-center max-w-full">
-                        <div className="w-72.5 h-132.75 max-w-full bg-muted/20 border border-border rounded-lg flex flex-col items-center justify-center relative overflow-hidden">
-                          <img
-                            src="/images/qrcode.jpg"
-                            alt="Client Payment QR"
-                            className="w-full h-full object-contain"
-                            onError={(e) => {
-                              (e.target as HTMLElement).style.display = 'none';
-                            }}
-                          />
-                          <div className="flex flex-col items-center gap-2 p-4 text-center text-muted-foreground">
-                            <QrCode className="w-12 h-12 text-accent/80" />
-                            <span className="font-mono text-sm font-semibold text-foreground">ATTAR HOUSE NEPAL</span>
-                            <span className="font-mono text-[10px] text-muted-foreground/80 tracking-widest uppercase">
-                              Official Settlement Portal
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="text-xs text-muted-foreground">
-                        <p className="font-medium text-foreground">Account Name: <span className="font-semibold text-accent">ATTAR HOUSE NEPAL</span></p>
-                        <p>Total Payable: <span className="font-bold text-accent">NPR {cart?.subtotal.toFixed(2)}</span></p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 pt-4 border-t border-border/50">
-                      <div>
-                        <label className="block text-xs font-medium uppercase tracking-wider mb-1.5 text-foreground/80">
-                          Transaction ID / Reference No. <span className="text-destructive">*</span>
-                        </label>
-                        <input
-                          required
-                          type="text"
-                          value={transactionId}
-                          onChange={(e) => setTransactionId(e.target.value)}
-                          className={inputClasses}
-                          placeholder="e.g. TXN984120391 or Reference No."
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-medium uppercase tracking-wider mb-1.5 text-foreground/80">
-                          Payment Screenshot <span className="text-destructive">*</span>
-                        </label>
-                        <div className="relative border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-accent/50 transition-colors bg-background/50 cursor-pointer">
-                          <input
-                            required
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          />
-                          <div className="flex flex-col items-center justify-center gap-1.5 text-xs text-muted-foreground">
-                            {paymentProof ? (
-                              <div className="flex items-center gap-2 text-emerald-600 font-semibold">
-                                <Check className="w-4 h-4" />
-                                <span className="truncate max-w-55">{paymentProof.name}</span>
-                              </div>
-                            ) : (
-                              <>
-                                <Upload className="w-5 h-5 text-accent" />
-                                <span className="font-medium text-foreground">Upload Payment Screenshot</span>
-                                <span className="text-[10px] text-muted-foreground">JPG, PNG format (Max 5MB)</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* eSewa Option */}
                 <label
@@ -574,15 +461,15 @@ export default function CheckoutPage() {
                     />
                     <div>
                       <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        eSewa Wallet
+                        eSewa QR Payment
                         <span className="text-[10px] bg-brass/15 text-accent font-medium px-2 py-0.5 rounded border border-brass/40">
-                          Test
+                          QR
                         </span>
                       </p>
                       <p className="text-xs text-muted-foreground">{PAYMENT_GUIDE.esewa}</p>
                     </div>
                   </div>
-                  <CreditCard className="w-5 h-5 text-muted-foreground" />
+                  <QrCode className="w-5 h-5 text-emerald-600" />
                 </label>
 
                 {/* Khalti Option */}
@@ -600,18 +487,103 @@ export default function CheckoutPage() {
                     />
                     <div>
                       <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        Khalti Digital Wallet
+                        Khalti QR Payment
                         <span className="text-[10px] bg-brass/15 text-accent font-medium px-2 py-0.5 rounded border border-brass/40">
-                          Test
+                          QR
                         </span>
                       </p>
                       <p className="text-xs text-muted-foreground">{PAYMENT_GUIDE.khalti}</p>
                     </div>
                   </div>
-                  <CreditCard className="w-5 h-5 text-muted-foreground" />
+                  <QrCode className="w-5 h-5 text-purple-600" />
                 </label>
 
               </div>
+
+              {qrMethod && qrDetails && (
+                <div className="mt-2 p-4 sm:p-5 bg-muted/30 border border-border rounded-lg space-y-4">
+                  <div className="text-center space-y-3">
+                    <p className="text-xs font-bold uppercase tracking-wider text-accent">
+                      Scan & Pay with {qrDetails.label}
+                    </p>
+
+                    <div className="mx-auto w-full max-w-[18rem]">
+                      {qrImageErrors[qrMethod] ? (
+                        <div className="flex h-64 w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-muted/20 p-4 text-center text-muted-foreground">
+                          <QrCode className="w-10 h-10 text-accent/80" />
+                          <span className="font-mono text-sm font-semibold text-foreground">ATTAR HOUSE NEPAL</span>
+                          <span className="font-mono text-[10px] text-muted-foreground/80 tracking-widest uppercase">
+                            Payment QR unavailable
+                          </span>
+                        </div>
+                      ) : (
+                        <img
+                          src={qrDetails.image}
+                          alt={qrDetails.alt}
+                          className="block h-auto max-h-[20rem] w-auto max-w-full rounded-lg border border-border/60 object-contain shadow-sm sm:max-h-[22rem]"
+                          onError={() => setQrImageErrors((prev) => ({ ...prev, [qrMethod]: true }))}
+                        />
+                      )}
+                    </div>
+
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <p className="font-medium text-foreground">
+                        Account Name: <span className="font-semibold text-accent">{qrDetails.accountName}</span>
+                      </p>
+                      <p>
+                        Product Amount Payable: <span className="font-bold text-accent">NPR {cart?.subtotal.toFixed(2)}</span>
+                      </p>
+                      <p className="text-[10px] leading-relaxed">
+                        Delivery charges are separate and paid directly to the Pathao/Indrive driver.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t border-border/50">
+                    <div>
+                      <label className="block text-xs font-medium uppercase tracking-wider mb-1.5 text-foreground/80">
+                        Transaction ID / Reference No. <span className="text-muted-foreground/60 lowercase">(optional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={transactionId}
+                        onChange={(e) => setTransactionId(e.target.value)}
+                        className={inputClasses}
+                        placeholder="e.g. TXN984120391 or Reference No."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium uppercase tracking-wider mb-1.5 text-foreground/80">
+                        Payment Screenshot <span className="text-destructive">*</span>
+                      </label>
+                      <div className="relative border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-accent/50 transition-colors bg-background/50 cursor-pointer">
+                        <input
+                          required
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="flex flex-col items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                          {paymentProof ? (
+                            <div className="flex items-center gap-2 text-emerald-600 font-semibold">
+                              <Check className="w-4 h-4" />
+                              <span className="truncate max-w-55">{paymentProof.name}</span>
+                            </div>
+                          ) : (
+                            <>
+                              <Upload className="w-5 h-5 text-accent" />
+                              <span className="font-medium text-foreground">Upload Payment Screenshot</span>
+                              <span className="text-[10px] text-muted-foreground">JPG, PNG format (Max 5MB)</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Submit Action */}
@@ -670,17 +642,15 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span className="font-medium text-foreground">NPR {cart?.subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-muted-foreground gap-3">
-                  <span>Shipping ({shippingZone})</span>
-                  <span className="text-xs text-right font-medium text-foreground">{quoteShipping(shippingZone, cart?.subtotal ?? 0).fee === 0 ? "FREE / on request" : `NPR ${quoteShipping(shippingZone, cart?.subtotal ?? 0).fee} est.`}</span>
-                </div>
                 <div className="border-t border-border pt-3 flex justify-between items-baseline">
-                  <span className="font-bold text-base text-foreground">Total Amount</span>
+                  <span className="font-bold text-base text-foreground">Product Total</span>
                   <span className="font-bold text-xl text-accent">
-                    NPR {((cart?.subtotal ?? 0) + quoteShipping(shippingZone, cart?.subtotal ?? 0).fee).toFixed(2)}
+                    NPR {cart?.subtotal.toFixed(2)}
                   </span>
                 </div>
-                <p className="text-[11px] text-muted-foreground">Charged today: NPR {cart?.subtotal.toFixed(2)} (cart only). Shipping confirmed by concierge.</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Delivery charges are separate and are paid directly by the receiver to the Pathao/Indrive driver, based on the actual delivery fare. We will inform the receiver of the payable delivery charge.
+                </p>
               </div>
 
               <div className="bg-muted/40 rounded-lg p-3.5 border border-border/40 text-xs text-muted-foreground flex items-start gap-2.5">

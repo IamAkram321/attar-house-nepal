@@ -46,6 +46,14 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function formatPaymentMethod(method?: string) {
+  if (!method) return '—';
+  if (method === 'esewa') return 'eSewa QR';
+  if (method === 'khalti') return 'Khalti QR';
+  if (method === 'qr') return 'Fonepay / Mobile Banking QR';
+  return method.replace(/_/g, ' ');
+}
+
 export default function AdminOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
@@ -206,7 +214,7 @@ export default function AdminOrderDetailPage() {
                     <div>
                       <p className="text-muted-foreground font-medium">Payment Method</p>
                       <p className="font-semibold text-foreground text-sm mt-0.5 capitalize">
-                        {order.paymentMethod ? order.paymentMethod.replace('_', ' ') : '—'}
+                        {formatPaymentMethod(order.paymentMethod)}
                       </p>
                     </div>
                   </div>
@@ -242,7 +250,7 @@ export default function AdminOrderDetailPage() {
               </div>
 
               {/* QR Payment Verification Card */}
-              {(order.transactionId || order.paymentProof || order.paymentMethod === 'qr') && (
+              {(order.transactionId || order.paymentProof || ['qr', 'esewa', 'khalti'].includes(order.paymentMethod ?? '')) && (
                 <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-sm space-y-4">
                   <div className="flex items-center justify-between border-b border-border/60 pb-3">
                     <div className="flex items-center gap-2">
@@ -250,7 +258,7 @@ export default function AdminOrderDetailPage() {
                       <h2 className="font-serif font-bold text-base text-foreground">Payment Verification</h2>
                     </div>
                     <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
-                      QR Gateway
+                      QR Payment
                     </span>
                   </div>
 

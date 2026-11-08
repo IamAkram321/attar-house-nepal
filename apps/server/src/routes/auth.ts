@@ -16,15 +16,89 @@ import { signupLimiter, loginLimiter, forgotPasswordLimiter, resetPasswordLimite
 
 const router = Router();
 
-function getBackendURL(): string {
-  const rawUrl = process.env.BACKEND_URL || "http://localhost:3000";
-  return rawUrl.trim().replace(/\/$/, "");
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  process.env.RENDER === "true" ||
+  Boolean(process.env.RENDER_EXTERNAL_URL);
+
+function normalizeUrl(value: string): string {
+  return value.trim().replace(/\/+$/, "");
+}
+
+function splitUrls(value: string | undefined): string[] {
+  if (!value) return [];
+
+  return value
+    .split(",")
+    .map(normalizeUrl)
+    .filter(Boolean);
+}
+
+function firstUrl(value: string | undefined): string {
+  return splitUrls(value)[0] ?? "";
+}
+
+function isLocalhostUrl(value: string): boolean {
+  if (!value) return false;
+
+  try {
+    const hostname = new URL(value).hostname.toLowerCase();
+    return (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname === "::1" ||
+      hostname === "[::1]"
+    );
+  } catch {
+    return false;
+  }
+}
+
+// A local .env value must never leak into the production OAuth flow.
+for (const name of ["BACKEND_URL", "FRONTEND_URL", "GOOGLE_CALLBACK_URL"] as const) {
+  if (isProduction && isLocalhostUrl(firstUrl(process.env[name]))) {
+    console.warn(`[auth] ${name} points to localhost in production; it will be ignored.`);
+  }
+}
+
+function getBackendURL(req?: Request): string {
+  const configured = firstUrl(process.env.BACKEND_URL);
+  if (configured && !(isProduction && isLocalhostUrl(configured))) {
+    return configured;
+  }
+
+  // Render provides this automatically, so production keeps working even when
+  // BACKEND_URL was copied from a local .env file.
+  const renderUrl = firstUrl(process.env.RENDER_EXTERNAL_URL);
+  if (renderUrl && !isLocalhostUrl(renderUrl)) {
+    return renderUrl;
+  }
+
+  if (!isProduction) {
+    return "http://localhost:3000";
+  }
+
+  if (req) {
+    return `${req.protocol}://${req.get("host")}`;
+  }
+
+  return "";
 }
 
 function getFrontendURL(): string {
-  const rawUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-  const firstUrl = rawUrl.split(",")[0].trim();
-  return firstUrl.replace(/\/$/, "");
+  const candidates = [
+    ...splitUrls(process.env.FRONTEND_URL),
+    ...splitUrls(process.env.APP_BASE_URL),
+    ...splitUrls(process.env.ALLOWED_ORIGINS),
+  ].filter(Boolean);
+
+  const publicUrl = candidates.find((url) => !(isProduction && isLocalhostUrl(url)));
+  if (publicUrl) {
+    return publicUrl;
+  }
+
+  return isProduction ? "" : "http://localhost:5173";
 }
 
 function getRequestOrigin(req: Request): string {
@@ -37,11 +111,14 @@ function getRequestOrigin(req: Request): string {
   return getFrontendURL();
 }
 
-function getCallbackURL(): string {
-  if (process.env.GOOGLE_CALLBACK_URL) {
-    return process.env.GOOGLE_CALLBACK_URL.trim();
+function getCallbackURL(req?: Request): string {
+  const configured = firstUrl(process.env.GOOGLE_CALLBACK_URL);
+  if (configured && !(isProduction && isLocalhostUrl(configured))) {
+    return configured;
   }
-  return `${getBackendURL()}/api/auth/google/callback`;
+
+  const backendUrl = getBackendURL(req);
+  return backendUrl ? `${backendUrl}/api/auth/google/callback` : "";
 }
 
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -50,7 +127,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: getCallbackURL(),
+        // callbackURL is supplied per request below, so the public backend
+        // origin is resolved at request time instead of being frozen at boot.
         passReqToCallback: false,
         proxy: true,
       },
@@ -157,7 +235,7 @@ router.get(
 
     passport.authenticate("google", {
       scope: ["profile", "email"],
-      callbackURL: getCallbackURL(),
+      callbackURL: getCallbackURL(req),
     } as passport.AuthenticateOptions & { callbackURL?: string })(req, res, next);
   }
 );
@@ -167,7 +245,7 @@ router.get(
   (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate(
       "google",
-      { callbackURL: getCallbackURL() } as passport.AuthenticateOptions & { callbackURL?: string },
+      { callbackURL: getCallbackURL(req) } as passport.AuthenticateOptions & { callbackURL?: string },
       (err: any, user: any) => {
         const frontendUrl = getFrontendURL();
 
@@ -503,8 +581,14 @@ router.get("/auth/me", async (req: Request, res: Response): Promise<void> => {
 
 router.post("/auth/logout", (req: Request, res: Response): void => {
   req.session.destroy(() => {
-    const cookieDomain = process.env.COOKIE_DOMAIN || undefined;
-    res.clearCookie("connect.sid", { path: "/", domain: cookieDomain });
+    const cookieDomain = process.env.COOKIE_DOMAIN?.trim() || undefined;
+    res.clearCookie("connect.sid", {
+      path: "/",
+      domain: cookieDomain,
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
     res.json({ success: true });
   });
 });

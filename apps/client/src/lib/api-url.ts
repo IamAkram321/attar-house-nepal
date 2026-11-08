@@ -1,4 +1,14 @@
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const configuredApiUrl = (import.meta.env.VITE_API_URL as string | undefined)
+  ?.trim()
+  .replace(/\/+$/, "");
+
+/**
+ * Production builds must set VITE_API_URL to the public backend origin.
+ * Only local development may fall back to the local Express server, so a
+ * missing production env var can never send requests to localhost.
+ */
+export const API_URL =
+  configuredApiUrl || (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 /**
  * Uploads files to /api/uploads with a hard timeout.

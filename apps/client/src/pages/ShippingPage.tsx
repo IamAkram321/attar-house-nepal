@@ -58,7 +58,7 @@ export default function ShippingPage() {
         <div className="rounded-3xl border border-neutral-200 bg-white p-8 sm:p-10 shadow-md mb-8">
           <h3 className="font-serif text-2xl font-normal text-neutral-900 mb-2">Delivery zones</h3>
           <p className="text-neutral-600 font-light text-sm leading-relaxed mb-6">
-            Estimates only. Backend charges cart subtotal; concierge confirms the final delivery fee at checkout.
+            Delivery estimates only. Checkout charges the product total; the delivery fare is separate and paid directly to the Pathao/Indrive driver based on the actual fare.
           </p>
           <div className="space-y-3">
             {ATTAR_SHIPPING_ZONES.map((z) => (
@@ -67,7 +67,7 @@ export default function ShippingPage() {
                   <p className="font-semibold text-sm text-neutral-900">{z.label}</p>
                   <p className="text-xs text-neutral-500 font-light mt-0.5">{z.detail}</p>
                 </div>
-                <span className="font-mono text-xs font-semibold text-neutral-900 shrink-0">{z.fee === 0 ? "On request" : `NPR ${z.fee}`}</span>
+                <span className="font-mono text-xs font-semibold text-neutral-900 shrink-0">{z.fee === 0 ? "On request" : `Est. NPR ${z.fee}`}</span>
               </div>
             ))}
           </div>
