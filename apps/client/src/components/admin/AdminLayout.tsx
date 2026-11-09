@@ -149,6 +149,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     }
   }, [user, location, setLocation]);
 
+  // Only redirect after /api/auth/me has finished loading, otherwise a valid
+  // session would briefly be treated as logged out on every hard refresh.
+  useEffect(() => {
+    if (!isLoading && !user) {
+      window.location.replace(`/login?next=${encodeURIComponent(location)}`);
+    }
+  }, [isLoading, user, location]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#121110]">
@@ -161,9 +169,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    // Google OAuth may be unconfigured on a fresh isolated backend (503).
-    // Send unauthenticated visitors to /login (email + Google options) instead.
-    window.location.href = "/login?next=/admin";
+    // The effect above performs the redirect after auth loading completes.
     return null;
   }
 

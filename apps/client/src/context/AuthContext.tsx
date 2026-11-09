@@ -26,7 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-const API_URL = (ENV_API_URL || import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_URL = ENV_API_URL.replace(/\/$/, '');
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

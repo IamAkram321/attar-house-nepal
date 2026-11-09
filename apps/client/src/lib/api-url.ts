@@ -3,12 +3,15 @@ const configuredApiUrl = (import.meta.env.VITE_API_URL as string | undefined)
   .replace(/\/+$/, "");
 
 /**
- * Production builds must set VITE_API_URL to the public backend origin.
- * Only local development may fall back to the local Express server, so a
- * missing production env var can never send requests to localhost.
+ * Production is served through the Vercel /api rewrite, so API calls must stay
+ * relative. Ignoring VITE_API_URL in production also stops a stale dashboard
+ * value (for example an onrender.com origin) from being baked into the bundle,
+ * which would bypass the first-party proxy and break session cookies.
+ * Local development may still point directly at Express (localhost fallback).
  */
-export const API_URL =
-  configuredApiUrl || (import.meta.env.DEV ? "http://localhost:3000" : "");
+export const API_URL = import.meta.env.DEV
+  ? configuredApiUrl || "http://localhost:3000"
+  : "";
 
 /**
  * Uploads files to /api/uploads with a hard timeout.

@@ -84,7 +84,9 @@ export default function LoginPage() {
 
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
-      window.location.href = next && next.startsWith("/") ? next : isAdmin ? '/admin' : '/';
+      const loggedInRole = data?.user?.role;
+      const loggedInIsAdmin = loggedInRole === 'ADMIN' || loggedInRole === 'SUPER_ADMIN';
+      window.location.href = next && next.startsWith("/") ? next : loggedInIsAdmin ? '/admin' : '/';
     } catch {
       toast({ title: 'Something went wrong. Please try again.', variant: 'destructive' });
     } finally {

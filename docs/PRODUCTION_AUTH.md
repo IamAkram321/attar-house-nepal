@@ -2,15 +2,22 @@
 
 ## Root cause of the production failure
 
-The deployed backend was resolving the Google callback from local development
-values (`GOOGLE_CALLBACK_URL` / `BACKEND_URL`). As a result,
-`/api/auth/google` sent Google a `redirect_uri` of
-`http://localhost:3000/api/auth/google/callback`, so production users were
-redirected to their own machine instead of the Render backend.
+The API is reached through the Vercel rewrite `/api/:path*` ->
+`https://attar-house-api.onrender.com/api/:path*`. That makes `connect.sid` a
+first-party cookie on the Vercel host.
 
-Production now ignores localhost callback/backend values and derives the public
-callback from `BACKEND_URL`, Render's `RENDER_EXTERNAL_URL`, or the incoming
-request host (in that order). Local development still uses localhost.
+Two things can still break the session:
+
+1. A Google callback on the Render host (`attar-house-api.onrender.com`) sets
+   the cookie on Render, not Vercel. The next same-origin `/api/auth/me` call
+   from the Vercel app therefore has no cookie and returns 401.
+2. A production bundle built with `VITE_API_URL=https://attar-house-api.onrender.com`
+   bypasses the proxy and calls Render directly, which has the same cookie
+   problem (and is blocked as a third-party cookie by some browsers).
+
+The code now keeps production API calls relative and falls back to
+`FRONTEND_URL/api/auth/google/callback` in production. Local development still
+uses the localhost callback/API values.
 
 ## Render environment variables
 
@@ -30,9 +37,9 @@ Optional:
 
 | Variable | Production value |
 | --- | --- |
-| `GOOGLE_CALLBACK_URL` | `https://attar-house-api.onrender.com/api/auth/google/callback` (safe to omit; derived from `BACKEND_URL`) |
+| `GOOGLE_CALLBACK_URL` | `https://attar-house-nepal-chi.vercel.app/api/auth/google/callback` (must go through the Vercel proxy; safe to omit because it is derived from `FRONTEND_URL`) |
 | `ALLOWED_ORIGINS` | extra comma-separated origins, e.g. Vercel preview URLs |
-| `COOKIE_DOMAIN` | leave **empty** for Vercel -> Render |
+| `COOKIE_DOMAIN` | leave **empty** so the cookie stays first-party on Vercel |
 
 Render sets `RENDER=true` / `RENDER_EXTERNAL_URL` automatically. The backend
 uses them to enable production cookies even if `NODE_ENV` is missing.
@@ -41,17 +48,18 @@ uses them to enable production cookies even if `NODE_ENV` is missing.
 
 | Variable | Production value |
 | --- | --- |
-| `VITE_API_URL` | `https://attar-house-api.onrender.com` |
+| `VITE_API_URL` | **Do not set it.** Production uses relative `/api` URLs through the rewrite. |
 | `VITE_RECAPTCHA_SITE_KEY` | Google reCAPTCHA site key (if used) |
 
-Redeploy the Vercel project after changing `VITE_API_URL` because Vite inlines
-it at build time.
+Redeploy the Vercel project after removing/changing variables because Vite
+inlines them at build time. An old deployment can keep calling Render directly
+until it is rebuilt.
 
 ## Google Cloud Console
 
 OAuth client -> Authorized redirect URIs:
 
-- `https://attar-house-api.onrender.com/api/auth/google/callback`
+- `https://attar-house-nepal-chi.vercel.app/api/auth/google/callback`
 - `http://localhost:3000/api/auth/google/callback` (local development)
 
 Authorized JavaScript origins (if required by the client type):
@@ -62,11 +70,14 @@ Authorized JavaScript origins (if required by the client type):
 ## Quick verification
 
 ```bash
-# Must show redirect_uri=https%3A%2F%2Fattar-house-api.onrender.com...
-curl -sS -i --max-redirs 0 https://attar-house-api.onrender.com/api/auth/google
+# Must proxy to Render (look for X-Render-Origin-Server: Render)
+curl -sS -i https://attar-house-nepal-chi.vercel.app/api/auth/me
+
+# Must show redirect_uri=https://attar-house-nepal-chi.vercel.app/api/auth/google/callback
+curl -sS -i --max-redirs 0 https://attar-house-nepal-chi.vercel.app/api/auth/google
 
 # Must echo the Vercel origin with credentials enabled
-curl -sS -i -X OPTIONS https://attar-house-api.onrender.com/api/auth/login \
+curl -sS -i -X OPTIONS https://attar-house-nepal-chi.vercel.app/api/auth/login \
   -H "Origin: https://attar-house-nepal-chi.vercel.app" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: content-type"

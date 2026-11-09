@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { UserPlus, X, Trash2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api-url';
 
 type RoleType = 
   | "SUPER_ADMIN" 
@@ -63,12 +64,10 @@ export default function AdminTeamPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const apiUrl = import.meta.env.VITE_API_URL || "";
-
   const fetchTeam = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${apiUrl}/api/admin/team`, {
+      const res = await fetch(`${API_URL}/api/admin/team`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch team members");
@@ -98,7 +97,7 @@ export default function AdminTeamPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${apiUrl}/api/admin/team/invite`, {
+      const res = await fetch(`${API_URL}/api/admin/team/invite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -141,7 +140,7 @@ export default function AdminTeamPage() {
       : [...currentPermissions, permissionKey];
 
     try {
-      const res = await fetch(`${apiUrl}/api/admin/team/${userId}/permissions`, {
+      const res = await fetch(`${API_URL}/api/admin/team/${userId}/permissions`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -160,7 +159,7 @@ export default function AdminTeamPage() {
 
   const handleRoleChange = async (userId: number, newRole: string) => {
     try {
-      const res = await fetch(`${apiUrl}/api/admin/team/${userId}/role`, {
+      const res = await fetch(`${API_URL}/api/admin/team/${userId}/role`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -182,7 +181,7 @@ export default function AdminTeamPage() {
     }
 
     try {
-      const res = await fetch(`${apiUrl}/api/admin/team/${userId}`, {
+      const res = await fetch(`${API_URL}/api/admin/team/${userId}`, {
         method: "DELETE",
         credentials: "include",
       });

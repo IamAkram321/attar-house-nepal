@@ -117,6 +117,17 @@ function getCallbackURL(req?: Request): string {
     return configured;
   }
 
+  // In production the browser must come back through the Vercel /api proxy,
+  // not directly to Render. A callback on the Render host sets connect.sid on
+  // that host, so the first-party /api/auth/me call from Vercel never sees it.
+  if (isProduction) {
+    const frontendUrl = getFrontendURL();
+    if (frontendUrl) {
+      return `${frontendUrl}/api/auth/google/callback`;
+    }
+  }
+
+  // Local dev keeps using the Express/Vite proxy origin.
   const backendUrl = getBackendURL(req);
   return backendUrl ? `${backendUrl}/api/auth/google/callback` : "";
 }
@@ -127,8 +138,9 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        // callbackURL is supplied per request below, so the public backend
-        // origin is resolved at request time instead of being frozen at boot.
+        // callbackURL is supplied per request below, so the public origin
+        // (the Vercel proxy in production) is resolved at request time
+        // instead of being frozen at boot.
         passReqToCallback: false,
         proxy: true,
       },
@@ -452,18 +464,29 @@ router.post("/auth/login", loginLimiter, async (req: Request, res: Response): Pr
       .set({ failedLoginAttempts: 0, lockedUntil: null })
       .where(eq(usersTable.id, user.id));
 
-    req.session.userId = user.id;
-    req.session.userRole = user.role;
-
-    req.session.save((err) => {
-      if (err) {
-        console.error("[auth/login] Session save error:", err);
+    // Use Passport's login flow (it regenerates the session id) and set the
+    // app-specific session fields inside its callback. Setting them before
+    // req.logIn would lose them during session regeneration.
+    req.logIn(user, (loginErr) => {
+      if (loginErr) {
+        console.error("[auth/login] req.logIn error:", loginErr);
         res.status(500).json({ error: "Internal server error" });
         return;
       }
 
-      res.json({
-        user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, role: user.role, createdAt: user.createdAt },
+      req.session.userId = user.id;
+      req.session.userRole = user.role;
+
+      req.session.save((err) => {
+        if (err) {
+          console.error("[auth/login] Session save error:", err);
+          res.status(500).json({ error: "Internal server error" });
+          return;
+        }
+
+        res.json({
+          user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, role: user.role, createdAt: user.createdAt },
+        });
       });
     });
   } catch (err) {
@@ -587,7 +610,7 @@ router.post("/auth/logout", (req: Request, res: Response): void => {
       domain: cookieDomain,
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "lax",
     });
     res.json({ success: true });
   });

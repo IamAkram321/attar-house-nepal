@@ -151,11 +151,10 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: isProduction,
-      // Cross-site deploys (e.g. *.vercel.app -> *.onrender.com) need
-      // SameSite=None + Secure, otherwise browsers drop the session cookie
-      // on API calls and every login silently fails. Same-site custom
-      // domains (app.example.com <-> api.example.com) could use "lax".
-      sameSite: isProduction ? "none" : "lax",
+      // Requests reach the API through the Vercel /api rewrite, so the
+      // browser sees connect.sid as a first-party Vercel cookie. Lax is
+      // sufficient (and more compatible) than SameSite=None for that setup.
+      sameSite: "lax",
       domain: cookieDomain,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",

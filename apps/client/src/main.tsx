@@ -2,15 +2,14 @@ import { createRoot } from 'react-dom/client';
 import { setBaseUrl } from '@workspace/api-client-react';
 
 import App from './App';
+import { API_URL } from './lib/api-url';
 
 import './index.css';
 
-// In production, the frontend (Vercel) and backend (Render) live on different
-// domains, so relative "/api/..." calls from the generated hooks need an
-// absolute base URL. Locally, VITE_API_URL is unset and requests stay
-// relative, going through Vite's dev proxy as before.
-if (import.meta.env.VITE_API_URL) {
-  setBaseUrl(import.meta.env.VITE_API_URL);
+// Production uses the same-origin /api rewrite (API_URL is empty). Local dev
+// may still use the explicit VITE_API_URL or the localhost fallback.
+if (API_URL) {
+  setBaseUrl(API_URL);
 }
 
 createRoot(document.getElementById('root')!).render(<App />);
