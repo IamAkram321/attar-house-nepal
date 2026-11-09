@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import {
   ShieldCheck,
@@ -91,6 +91,11 @@ export default function CheckoutPage() {
     khalti: false,
   });
 
+  useEffect(() => {
+    if (!orderPlaced) return;
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [orderPlaced]);
+
   const handleChange = (field: keyof typeof form) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -182,7 +187,7 @@ export default function CheckoutPage() {
 
   if (orderPlaced) {
     return (
-      <div className="pt-12 pb-20 min-h-[80vh] flex flex-col items-center justify-center px-4 bg-background">
+      <div className="pt-[118px] md:pt-[112px] pb-20 min-h-[80vh] flex flex-col items-center justify-center px-4 bg-background">
         <div className="max-w-md w-full text-center bg-card border border-border p-8 rounded-xl shadow-sm space-y-6">
           <div className="w-16 h-16 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-10 h-10" />

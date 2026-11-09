@@ -185,7 +185,7 @@ export const SHOP_FAMILIES: ShopFamily[] = [
 ];
 
 /** Primary brands in display order. Others appear dynamically under “Other brands”. */
-export const PRIMARY_BRANDS = ["Al-Nuaim", "Al-Rehab", "Adil Qadri"] as const;
+export const PRIMARY_BRANDS = ["Ajmal", "Al-Nuaim", "Al-Rehab", "Adil Qadri"] as const;
 
 const norm = (v: unknown): string[] => {
   if (Array.isArray(v)) return v.map((t) => String(t ?? "").toLowerCase());

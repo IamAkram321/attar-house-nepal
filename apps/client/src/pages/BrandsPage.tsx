@@ -76,7 +76,7 @@ export default function BrandsPage() {
                   <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-brass">
                     {countFor(brand)} {countFor(brand) === 1 ? "attar" : "attars"}
                   </p>
-                  <h2 className="mt-2 font-serif text-3xl tracking-tight">{brand}</h2>
+                  <h2 className="mt-2 font-serif text-3xl tracking-tight text-ivory">{brand}</h2>
                   <span className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-[#E9D9B8] group-hover:text-white">
                     Shop {brand} <ArrowUpRight className="w-3.5 h-3.5" />
                   </span>
